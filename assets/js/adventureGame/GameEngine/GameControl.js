@@ -78,9 +78,17 @@ class GameControl {
         // Clean up any lingering interaction handlers
         this.cleanupInteractionHandlers();
 
+        // Create new level
         const GameLevelClass = this.levelClasses[this.currentLevelIndex];
         this.currentLevel = new GameLevel(this);
+        
+        // Initialize the new level
         this.currentLevel.create(GameLevelClass);
+        
+        // Ensure we're not paused
+        this.isPaused = false;
+        
+        // Start the game loop
         this.gameLoop();
     }
 
@@ -131,16 +139,24 @@ class GameControl {
             alert("All levels completed.");
         }
         
+        // Store reference to current level before cleanup
+        const oldLevel = this.currentLevel;
+        
         // Clean up any lingering interaction handlers
         this.cleanupInteractionHandlers();
         
-        this.currentLevel.destroy();
+        // Destroy the current level
+        if (oldLevel) {
+            oldLevel.destroy();
+        }
         
         // Call the gameOver callback if it exists
         if (this.gameOver) {
             this.gameOver();
         } else {
             this.currentLevelIndex++;
+            // Ensure we're not paused before transitioning
+            this.isPaused = false;
             this.transitionToLevel();
         }
     }
