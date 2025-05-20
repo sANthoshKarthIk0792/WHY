@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CS Fighters</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="game-container">
+        <!-- Main Menu Screen -->
+        <div id="main-menu" class="screen">
+            <h1 class="game-title">CS Fighters</h1>
+            <div class="menu-options">
+                <button id="singleplayer-btn" class="menu-btn">Single Player</button>
+                <button id="multiplayer-btn" class="menu-btn">PvP Battle</button>
+                <button id="settings-btn" class="menu-btn">Settings</button>
+            </div>
+        </div>
+
+        <!-- Character Selection Screen -->
+        <div id="character-select" class="screen hidden">
+            <h2>CHOOSE UR FREAKIN FIGHTER!!!!!!</h2>
+            <div class="character-grid">
+                <div class="character-grid-header">
+                    <div class="player-selection">
+                        <h3>Player 1</h3>
+                        <div class="character-select-status">Selecting...</div>
+                    </div>
+                    <div class="player-selection">
+                        <h3>Player 2</h3>
+                        <div class="character-select-status">Selecting...</div>
+                    </div>
+                </div>
+                <div class="character-card" data-character="mort">
+                    <div class="character-portrait mort"></div>
+                    <h3>Mort</h3>
+                    <p>SHHHH</p>
+                </div>
+                <div class="character-card" data-character="zhenglorant">
+                    <div class="character-portrait zhenglorant"></div>
+                    <h3>ZhengLorant</h3>
+                    <p>Chamber Valorant</p>
+                </div>
+                <div class="character-card" data-character="namira">
+                    <div class="character-portrait namira"></div>
+                    <h3>Namira</h3>
+                    <p>ZONER ZONER ZONER ZONER</p>
+                </div>
+                <div class="character-card" data-character="nigilekbam">
+                    <div class="character-portrait nigilekbam"></div>
+                    <h3>Nigil Ekbam</h3>
+                    <p>Slacker with some serious power</p>
+                </div>
+                <div class="character-card" data-character="east">
+                    <div class="character-portrait east"></div>
+                    <h3>East Shetanfi</h3>
+                    <p>JS GOD, easily distracted by things to tinker with</p>
+                </div>
+                <div class="character-card" data-character="rufat">
+                    <div class="character-portrait rufat"></div>
+                    <h3>Rufat Banshee</h3>
+                    <p>Fat person who takes all the credit for your work and does not know how to code.</p>
+                </div>
+                <div class="character-card" data-character="cyberpatriotvet">
+                    <div class="character-portrait cyberpatriotvet"></div>
+                    <h3>CyberPatriot Vet</h3>
+                    <p>Retired CyberPatriot finalist turned artist, master of chaos</p>
+                </div>
+                <div class="character-card" data-character="rachgpt">
+                    <div class="character-portrait rachgpt"></div>
+                    <h3>RachGPT</h3>
+                    <p>Mort's Blade</p>
+                </div>
+            </div>
+            <button id="start-game-btn" class="menu-btn">Start Game</button>
+            <button id="back-to-menu-btn" class="menu-btn">Back</button>
+        </div>
+
+        <!-- Game Screen -->
+        <div id="game-screen" class="screen hidden">
+            <div class="game-header">
+                <div class="player-info player1-info">
+                    <h3 id="player1-name">Player 1</h3>
+                    <div class="health-bar">
+                        <div class="health-fill" id="player1-health"></div>
+                    </div>
+                    <div class="skill-bar">
+                        <div class="skill" id="player1-basic-skill">Q</div>
+                        <div class="skill" id="player1-special-skill">E</div>
+                        <div class="skill" id="player1-ultimate-skill">R</div>
+                    </div>
+                </div>
+                <div class="player-info player2-info">
+                    <h3 id="player2-name">Player 2</h3>
+                    <div class="health-bar">
+                        <div class="health-fill" id="player2-health"></div>
+                    </div>
+                    <div class="skill-bar">
+                        <div class="skill" id="player2-basic-skill">Q</div>
+                        <div class="skill" id="player2-special-skill">E</div>
+                        <div class="skill" id="player2-ultimate-skill">R</div>
+                    </div>
+                </div>
+                <div class="game-controls">
+                    <button id="pause-btn">Pause</button>
+                </div>
+            </div>
+            
+            <canvas id="game-canvas"></canvas>
+            
+            <div class="game-footer">
+                <div id="status-message">Ready!</div>
+                <div class="controls-hint">
+                    <p>Player 1: Move: WASD | Attack: T | Skills: Q/E/R</p>
+                    <p>Player 2: Move: Arrow Keys | Attack: M | Skills: ,/./</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pause Screen -->
+        <div id="pause-screen" class="screen hidden">
+            <h2>Game Paused</h2>
+            <button id="resume-btn" class="menu-btn">Resume</button>
+            <button id="exit-to-menu-btn" class="menu-btn">Exit to Menu</button>
+        </div>
+    </div>
+
+    <!-- Load scripts in the correct order -->
+    <script src="js/Config.js"></script>
+    <script src="js/Utils.js"></script>
+    <script src="js/Input.js"></script>
+    <script src="js/Game.js"></script>
+    <script src="js/Main.js"></script>
+</body>
+</html>
