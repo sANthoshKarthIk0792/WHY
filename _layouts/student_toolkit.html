@@ -84,18 +84,43 @@ active_tab: toolkit
         grid-auto-flow: row;
         grid-template-areas:
             "header"
+            "calendar"
             "bathroom"
             "groups"
             "screen-queue"
             "assignment-submissions"
             "seed-tracker"
-            "sagai"
+            "teamteach"
             "view-grades";
         grid-area: main-info;
     }
 
     .header {
         grid-area: header;
+    }
+
+    .calendar {
+        display: grid;
+        grid-template-columns: 150px 1fr;
+        grid-template-rows: 1fr;
+        gap: 0px 0px;
+        grid-auto-flow: row;
+        grid-template-areas:
+            "calendar-thumbnail calendar-details";
+        grid-area: calendar;
+    }
+
+    .calendar-details {
+        grid-area: calendar-details;
+        padding: 30px;
+    }
+
+    .calendar-thumbnail {
+        grid-area: calendar-thumbnail;
+        background-color: white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
     }
 
     .bathroom {
@@ -218,24 +243,24 @@ active_tab: toolkit
         align-items: center;
     }
 
-    .sagai {
+    .teamteach {
         display: grid;
         grid-template-columns: 150px 1fr;
         grid-template-rows: 1fr;
         gap: 0px 0px;
         grid-auto-flow: row;
         grid-template-areas:
-            "sagai-thumbnail sagai-details";
-        grid-area: sagai;
+            "teamteach-thumbnail teamteach-details";
+        grid-area: teamteach;
     }
 
-    .sagai-details {
-        grid-area: sagai-details;
+    .teamteach-details {
+        grid-area: teamteach-details;
         padding: 30px;
     }
 
-    .sagai-thumbnail {
-        grid-area: sagai-thumbnail;
+    .teamteach-thumbnail {
+        grid-area: teamteach-thumbnail;
         background-color: white;
         display: flex;
         justify-content: center;
@@ -421,6 +446,29 @@ active_tab: toolkit
         <p>Access all student toolkits here.</p>
     </div>
 
+
+    <!-- calendar -->
+    <a href="{{site.baseurl}}/student/calendar">
+        <div class="calendar card">
+            <div class="calendar-details">
+                <h3>Calendar</h3>
+                <p>This tool lets you:</p>
+                <ul>
+                    <li>Add/Edit/Delete events to calendar</li>
+                    <li>View all events</li>
+                    <li>View events specific to each period</li>
+                    <li>Month, week, and day viewing options</li>
+
+                </ul>
+            </div>
+            <div class="calendar-thumbnail">
+                <img src="{{site.baseurl}}/images/toolkit-nav-buttons/calendar.png" alt="Calendar"
+                    class="thumbnail">
+            </div>
+        </div>
+    </a>
+
+
     <!-- bathroom -->
     <a href="{{site.baseurl}}/hallpass">
         <div class="bathroom card">
@@ -515,19 +563,19 @@ active_tab: toolkit
         </div>
     </a>
 
-    <!-- sagai -->
-    <a href="{{site.baseurl}}/student/TeamTeachToolkit/signup">
-        <div class="sagai card">
-            <div class="sagai-details">
-                <h3>Team Teach SignUp</h3>
+    <!-- Team Teach Signup -->
+    <a href="{{site.baseurl}}/student/teamteachsignup">
+        <div class="teamteach card">
+            <div class="teamteach-details">
+                <h3>Team Teach Sign  Up</h3>
                 <p>This tool lets you:</p>
                 <ul>
                     <li>Create Team Teach assignments and display the topics with dates</li>
                     <li>Sign up for team teaches with your account</li>
                 </ul>
             </div>
-            <div class="sagai-thumbnail">
-                <img src="{{site.baseurl}}/images/toolkit-nav-buttons/sagai.png" alt="SAGAI" class="thumbnail">
+            <div class="teamteach-thumbnail">
+                <img src="{{site.baseurl}}/images/toolkit-nav-buttons/teamteachsignup.png" alt="Team Teach" class="thumbnail">
             </div>
         </div>
     </a>

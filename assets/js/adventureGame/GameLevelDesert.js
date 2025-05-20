@@ -137,151 +137,140 @@ class GameLevelDesert {
           }
       };
     
-        const sprite_src_endportal = path + "/images/gamify/exitportalfull.png";
-        const sprite_greet_endportal = "Teleport to the End? Press E";
-        const sprite_data_endportal = {
-            id: 'End Portal',
-            greeting: sprite_greet_endportal,
-            src: sprite_src_endportal,
-            SCALE_FACTOR: 6,
-            ANIMATION_RATE: 100,
-            pixels: {width: 2029, height: 2025},
-            INIT_POSITION: { x: (width * 2 / 5), y: (height * 1 / 10)},
-            orientation: {rows: 1, columns: 1 },
-            down: {row: 0, start: 0, columns: 1 },
-            hitbox: { widthPercentage: 0.1, heightPercentage: 0.2 },
-            // Add dialogues array for random messages
-            dialogues: [
-                "The End dimension awaits brave explorers.",
-                "Through this portal lies a realm of floating islands and strange creatures.",
-                "The Enderman guards ancient treasures. Who knows what else lurks beyond this portal?",
-                "Many have entered. Few have returned.",
-                "The void calls to you. Will you answer?",
-                "The End is not truly the end, but a new beginning.",
-                "Strange things await you beyond this portal..",
-                "Prepare yourself. The journey beyond won't be easy."
-            ],
-            reaction: function() {
-                // Make sure we use 'this' safely - if dialogueSystem is undefined, create it
-                const dialogueSystem = new DialogueSystem({
-                    dialogues: [this.spriteData?.greeting || "Portal to The End"]
-                });
-            },
-            interact: function() {
-                // For NPCs that should show random dialogue messages
-                if (this.spriteData.dialogues) {
-                    // Create a new DialogueSystem instance
-                    const dialogueSystem = new DialogueSystem({
-                        dialogues: this.spriteData.dialogues
-                    });
-                    
-                    // Show random dialogue
-                    const randomIndex = Math.floor(Math.random() * this.spriteData.dialogues.length);
-                    dialogueSystem.showDialogue(
-                        this.spriteData.dialogues[randomIndex], 
-                        this.spriteData.id, 
-                        this.spriteData.src
-                    );
-                }
-                
-                // For NPCs with buttons (like End Portal), create a new dialogue and add buttons directly:
-                if (this.spriteData.id === "End Portal") {
-                    const dialogueSystem = new DialogueSystem();
-                    dialogueSystem.showDialogue(
-                        "Do you wish to enter The End dimension?",
-                        "End Portal",
-                        this.spriteData.src
-                    );
-                    
-                    // Add buttons directly to the dialogue
-                    dialogueSystem.addButtons([
-                        {
-                            text: "Enter Portal",
-                            primary: true,
-                            action: () => {
-                                dialogueSystem.closeDialogue();
-                                
-                                // Clean up the current game state
-                                if (gameEnv && gameEnv.gameControl) {
-                                    // Store reference to the current game control
-                                    const gameControl = gameEnv.gameControl;
-                                    
-                                    // Create fade overlay for transition
-                                    const fadeOverlay = document.createElement('div');
-                                    Object.assign(fadeOverlay.style, {
-                                        position: 'fixed',
-                                        top: '0',
-                                        left: '0',
-                                        width: '100%',
-                                        height: '100%',
-                                        backgroundColor: '#000',
-                                        opacity: '0',
-                                        transition: 'opacity 1s ease-in-out',
-                                        zIndex: '9999'
-                                    });
-                                    document.body.appendChild(fadeOverlay);
-                                    
-                                    console.log("Starting End level transition...");
-                                    
-                                    // Fade in
-                                    requestAnimationFrame(() => {
-                                        fadeOverlay.style.opacity = '1';
-                                        
-                                        // After fade in, transition to End level
-                                        setTimeout(() => {
-                                            // Clean up current level properly
-                                            if (gameControl.currentLevel) {
-                                                // Properly destroy the current level
-                                                console.log("Destroying current level...");
-                                                gameControl.currentLevel.destroy();
-                                                
-                                                // Force cleanup of any remaining canvases
-                                                const gameContainer = document.getElementById('gameContainer');
-                                                const oldCanvases = gameContainer.querySelectorAll('canvas:not(#gameCanvas)');
-                                                oldCanvases.forEach(canvas => {
-                                                    console.log("Removing old canvas:", canvas.id);
-                                                    canvas.parentNode.removeChild(canvas);
-                                                });
-                                            }
-                                            
-                                            console.log("Setting up End level...");
-                                            
-                                            // IMPORTANT: Store the original level classes for return journey
-                                            gameControl._originalLevelClasses = gameControl.levelClasses;
-                                            
-                                            // Change the level classes to GameLevelEnd
-                                            gameControl.levelClasses = [GameLevelEnd];
-                                            gameControl.currentLevelIndex = 0;
-                                            
-                                            // Make sure game is not paused
-                                            gameControl.isPaused = false;
-                                            
-                                            // Start the End level with the same control
-                                            console.log("Transitioning to End level...");
-                                            gameControl.transitionToLevel();
-                                            
-                                            // Fade out overlay
-                                            setTimeout(() => {
-                                                fadeOverlay.style.opacity = '0';
-                                                setTimeout(() => {
-                                                    document.body.removeChild(fadeOverlay);
-                                                }, 1000);
-                                            }, 500);
-                                        }, 1000);
-                                    });
-                                }
-                            }
-                        },
-                        {
-                            text: "Not Ready",
-                            action: () => {
-                                dialogueSystem.closeDialogue();
-                            }
-                        }
-                    ]);
-                }
-            }
-        };
+      const sprite_src_endportal = path + "/images/gamify/exitportalfull.png";
+      const sprite_greet_endportal = "Teleport to the End? Press E";
+      const sprite_data_endportal = {
+          id: 'End Portal',
+          greeting: sprite_greet_endportal,
+          src: sprite_src_endportal,
+          SCALE_FACTOR: 6,
+          ANIMATION_RATE: 100,
+          pixels: {width: 2029, height: 2025},
+          INIT_POSITION: { x: (width * 2 / 5), y: (height * 1 / 10)},
+          orientation: {rows: 1, columns: 1 },
+          down: {row: 0, start: 0, columns: 1 },
+          hitbox: { widthPercentage: 0.1, heightPercentage: 0.2 },
+          // Add dialogues array for random messages
+          dialogues: [
+              "The End dimension awaits brave explorers.",
+              "Through this portal lies a realm of floating islands and strange creatures.",
+              "The Enderman guards ancient treasures. Who knows what else lurks beyond this portal?",
+              "Many have entered. Few have returned.",
+              "The void calls to you. Will you answer?",
+              "The End is not truly the end, but a new beginning.",
+              "Strange things await you beyond this portal..",
+              "Prepare yourself. The journey beyond won't be easy."
+          ],
+          reaction: function() {
+              // Don't show any reaction dialogue - this prevents the first alert
+              // The interact function will handle all dialogue instead
+          },
+          interact: function() {
+              // Clear any existing dialogue first to prevent duplicates
+              if (this.dialogueSystem && this.dialogueSystem.isDialogueOpen()) {
+                  this.dialogueSystem.closeDialogue();
+              }
+              
+              // Create a new dialogue system if needed
+              if (!this.dialogueSystem) {
+                  this.dialogueSystem = new DialogueSystem();
+              }
+              
+              // Show portal dialogue with buttons
+              this.dialogueSystem.showDialogue(
+                  "Do you wish to enter The End dimension?",
+                  "End Portal",
+                  this.spriteData.src
+              );
+              
+              // Add buttons directly to the dialogue
+              this.dialogueSystem.addButtons([
+                  {
+                      text: "Enter Portal",
+                      primary: true,
+                      action: () => {
+                          this.dialogueSystem.closeDialogue();
+                          
+                          // Clean up the current game state
+                          if (gameEnv && gameEnv.gameControl) {
+                              // Store reference to the current game control
+                              const gameControl = gameEnv.gameControl;
+                              
+                              // Create fade overlay for transition
+                              const fadeOverlay = document.createElement('div');
+                              Object.assign(fadeOverlay.style, {
+                                  position: 'fixed',
+                                  top: '0',
+                                  left: '0',
+                                  width: '100%',
+                                  height: '100%',
+                                  backgroundColor: '#000',
+                                  opacity: '0',
+                                  transition: 'opacity 1s ease-in-out',
+                                  zIndex: '9999'
+                              });
+                              document.body.appendChild(fadeOverlay);
+                              
+                              console.log("Starting End level transition...");
+                              
+                              // Fade in
+                              requestAnimationFrame(() => {
+                                  fadeOverlay.style.opacity = '1';
+                                  
+                                  // After fade in, transition to End level
+                                  setTimeout(() => {
+                                      // Clean up current level properly
+                                      if (gameControl.currentLevel) {
+                                          // Properly destroy the current level
+                                          console.log("Destroying current level...");
+                                          gameControl.currentLevel.destroy();
+                                          
+                                          // Force cleanup of any remaining canvases
+                                          const gameContainer = document.getElementById('gameContainer');
+                                          const oldCanvases = gameContainer.querySelectorAll('canvas:not(#gameCanvas)');
+                                          oldCanvases.forEach(canvas => {
+                                              console.log("Removing old canvas:", canvas.id);
+                                              canvas.parentNode.removeChild(canvas);
+                                          });
+                                      }
+                                      
+                                      console.log("Setting up End level...");
+                                      
+                                      // IMPORTANT: Store the original level classes for return journey
+                                      gameControl._originalLevelClasses = gameControl.levelClasses;
+                                      
+                                      // Change the level classes to GameLevelEnd
+                                      gameControl.levelClasses = [GameLevelEnd];
+                                      gameControl.currentLevelIndex = 0;
+                                      
+                                      // Make sure game is not paused
+                                      gameControl.isPaused = false;
+                                      
+                                      // Start the End level with the same control
+                                      console.log("Transitioning to End level...");
+                                      gameControl.transitionToLevel();
+                                      
+                                      // Fade out overlay
+                                      setTimeout(() => {
+                                          fadeOverlay.style.opacity = '0';
+                                          setTimeout(() => {
+                                              document.body.removeChild(fadeOverlay);
+                                          }, 1000);
+                                      }, 500);
+                                  }, 1000);
+                              });
+                          }
+                      }
+                  },
+                  {
+                      text: "Not Ready",
+                      action: () => {
+                          this.dialogueSystem.closeDialogue();
+                      }
+                  }
+              ]);
+          }
+      }
           
       const sprite_src_stocks = path + "/images/gamify/stockguy.png";
       const sprite_greet_stocks = "Darn it, I lost some money on the stock market.. come with me to help me out?";

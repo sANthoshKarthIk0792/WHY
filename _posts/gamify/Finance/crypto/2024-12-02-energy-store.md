@@ -68,27 +68,27 @@ permalink: /crypto/energy-store
             }
         }
         window.buyEnergyPlan = async function(supplierName, eem) {
-            fetchUser()
             try {
                 const url = `${javaURI}/api/mining/chooseEnergy/${encodeURIComponent(supplierName)}/${eem}`;
                 const response = await fetch(url, {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json'
-                    }
+                        'Content-Type': 'application/json',
+                        ...fetchOptions.headers
+                    },
+                    credentials: 'include'
                 });
                 if (response.ok) {
                     const result = await response.json();
-                    alert(`Successfully purchased ${supplierName} plan (Consumes ${eem} EEM)`);
+                    showNotification(`Successfully purchased ${supplierName} plan (Consumes ${eem} EEM)`, false);
                     fetchUserBalance();
                 } else {
-                    const error = await response.json(); // ✅ Only call once
-                    console.log(error); // ✅ Log it once
-                    alert(`Error: ${error.message}`);
+                    const error = await response.json();
+                    showNotification(`Error: ${error.message || 'Failed to purchase energy plan'}`, true);
                 }
             } catch (error) {
                 console.error('Error during purchase:', error);
-                alert('Purchase failed. Please try again.');
+                showNotification('Purchase failed. Please try again.', true);
             }
         };
         fetchUser();
@@ -102,37 +102,37 @@ permalink: /crypto/energy-store
                 <div class="bg-gray-800 p-6 rounded-lg shadow-xl">
                     <h3 class="text-2xl font-semibold text-green-400">Tesla Energy</h3>
                     <p class="text-lg mt-2">Price: $12.99</p>
-                    <p class="text-sm text-green-300">Consumes: 0.094 EEM</p>
+                    <p class="text-sm text-green-300">Consumes: 0.12 EEM</p>
                     <button class="mt-4 w-full py-2 bg-green-500 text-white rounded-lg hover:bg-green-600"
-                        onclick="buyEnergyPlan('Tesla Energy', 0.094)">Buy</button>
+                        onclick="buyEnergyPlan('Tesla Energy', 0.12)">Buy</button>
                 </div>
                 <div class="bg-gray-800 p-6 rounded-lg shadow-xl">
                     <h3 class="text-2xl font-semibold text-green-400">Duke Energy</h3>
                     <p class="text-lg mt-2">Price: $14.49</p>
-                    <p class="text-sm text-green-300">Consumes: 0.128 EEM</p>
+                    <p class="text-sm text-green-300">Consumes: 0.15 EEM</p>
                     <button class="mt-4 w-full py-2 bg-green-500 text-white rounded-lg hover:bg-green-600"
-                        onclick="buyEnergyPlan('Duke Energy', 0.128)">Buy</button>
+                        onclick="buyEnergyPlan('Duke Energy', 0.15)">Buy</button>
                 </div>
                 <div class="bg-gray-800 p-6 rounded-lg shadow-xl">
                     <h3 class="text-2xl font-semibold text-green-400">Pacific Gas and Electric</h3>
                     <p class="text-lg mt-2">Price: $16.25</p>
-                    <p class="text-sm text-green-300">Consumes: 0.157 EEM</p>
+                    <p class="text-sm text-green-300">Consumes: 0.18 EEM</p>
                     <button class="mt-4 w-full py-2 bg-green-500 text-white rounded-lg hover:bg-green-600"
-                        onclick="buyEnergyPlan('Pacific Gas and Electric', 0.157)">Buy</button>
+                        onclick="buyEnergyPlan('Pacific Gas and Electric', 0.18)">Buy</button>
                 </div>
                 <div class="bg-gray-800 p-6 rounded-lg shadow-xl">
                     <h3 class="text-2xl font-semibold text-green-400">NextEra Energy</h3>
                     <p class="text-lg mt-2">Price: $18.75</p>
-                    <p class="text-sm text-green-300">Consumes: 0.186 EEM</p>
+                    <p class="text-sm text-green-300">Consumes: 0.21 EEM</p>
                     <button class="mt-4 w-full py-2 bg-green-500 text-white rounded-lg hover:bg-green-600"
-                        onclick="buyEnergyPlan('NextEra Energy', 0.186)">Buy</button>
+                        onclick="buyEnergyPlan('NextEra Energy', 0.21)">Buy</button>
                 </div>
                 <div class="bg-gray-800 p-6 rounded-lg shadow-xl">
                     <h3 class="text-2xl font-semibold text-green-400">Southern Company</h3>
                     <p class="text-lg mt-2">Price: $21.99</p>
-                    <p class="text-sm text-green-300">Consumes: 0.219 EEM</p>
+                    <p class="text-sm text-green-300">Consumes: 0.24 EEM</p>
                     <button class="mt-4 w-full py-2 bg-green-500 text-white rounded-lg hover:bg-green-600"
-                        onclick="buyEnergyPlan('Southern Company', 0.219)">Buy</button>
+                        onclick="buyEnergyPlan('Southern Company', 0.24)">Buy</button>
                 </div>
             </div>
         </div>

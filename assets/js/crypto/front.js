@@ -66,8 +66,8 @@ async function fetchUserBalance() {
   }
 }
 
-// Update balance every 5 seconds
-setInterval(fetchUserBalance, 5000);
+// Update balance every 15 minutes
+setInterval(fetchUserBalance, 900000);
 
 // Initial fetch
 fetchUser();
@@ -148,32 +148,102 @@ function updateActiveGPUsList() {
   });
 }
 
-// Make toggleMining globally available
-window.toggleMining = async function () {
-  try {
-    const options = {
-      ...fetchOptions,
-      method: 'POST',
-      cache: 'no-cache'
-    };
-    const response = await fetch(`${javaURI}/api/mining/toggle`, options);
-    const result = await response.json();
-    console.log('Mining toggle result:', result);
+let countdownInterval;
+let miningTimeLeft = 900; // 15 minutes in seconds
 
-    updateMiningButton(result.isMining);
-    if (result.isMining) {
-      startPeriodicUpdates();
-      showNotification('Mining started successfully');
-    } else {
-      stopPeriodicUpdates();
-      showNotification('Mining stopped');
+function formatTime(seconds) {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+}
+
+function startCountdown() {
+    const countdownElement = document.getElementById('mining-countdown');
+    const timerElement = document.getElementById('countdown-timer');
+    const miningButton = document.getElementById('start-mining');
+    
+    countdownElement.classList.remove('hidden');
+    countdownElement.classList.add('visible');
+    miningButton.classList.add('loading');
+    
+    miningTimeLeft = 900; // Reset to 15 minutes
+    timerElement.textContent = formatTime(miningTimeLeft);
+    
+    if (countdownInterval) clearInterval(countdownInterval);
+    
+    countdownInterval = setInterval(() => {
+        miningTimeLeft--;
+        timerElement.textContent = formatTime(miningTimeLeft);
+        
+        if (miningTimeLeft <= 0) {
+            clearInterval(countdownInterval);
+            countdownElement.classList.remove('visible');
+            countdownElement.classList.add('hidden');
+            miningButton.classList.remove('loading');
+            updateMiningStats();
+            startCountdown(); // Restart countdown for next cycle
+        }
+    }, 1000);
+}
+
+function stopCountdown() {
+    if (countdownInterval) {
+        clearInterval(countdownInterval);
+        countdownInterval = null;
     }
-    await updateMiningStats();
-  } catch (error) {
-    console.error('Error toggling mining:', error);
-    showNotification('Error toggling mining state');
-  }
+    
+    const countdownElement = document.getElementById('mining-countdown');
+    const miningButton = document.getElementById('start-mining');
+    
+    countdownElement.classList.remove('visible');
+    countdownElement.classList.add('hidden');
+    miningButton.classList.remove('loading');
+}
+
+// Update the toggleMining function
+window.toggleMining = async function () {
+    try {
+        const options = {
+            ...fetchOptions,
+            method: 'POST',
+            cache: 'no-cache'
+        };
+        const response = await fetch(`${javaURI}/api/mining/toggle`, options);
+        const result = await response.json();
+        console.log('Mining toggle result:', result);
+
+        updateMiningButton(result.isMining);
+        if (result.isMining) {
+            startPeriodicUpdates();
+            startCountdown();
+            showNotification('Mining started successfully');
+        } else {
+            stopPeriodicUpdates();
+            stopCountdown();
+            showNotification('Mining stopped');
+        }
+        await updateMiningStats();
+    } catch (error) {
+        console.error('Error toggling mining:', error);
+        showNotification('Error toggling mining state');
+    }
 };
+
+// Update the updateMiningButton function
+function updateMiningButton(isActive) {
+    const button = document.getElementById('start-mining');
+    if (button) {
+        if (isActive) {
+            button.textContent = 'Stop Mining';
+            button.className = 'mining-button start-mining active loading';
+        } else {
+            button.textContent = 'Start Mining';
+            button.className = 'mining-button start-mining';
+        }
+    } else {
+        console.error('Mining button not found');
+    }
+}
 
 let hashrateChart, profitChart;
 let updateInterval;
@@ -254,6 +324,41 @@ function initializeCharts() {
     }
   });
 }
+
+async function fetchCurrentEnergyPlan() {
+    try {
+        const response = await fetch(`${javaURI}/api/mining/energy`, {
+            ...fetchOptions,
+            method: 'GET',
+            credentials: 'include'
+        });
+        
+        if (!response.ok) {
+            if (response.status === 401) {
+                throw new Error('Please log in to view energy plan');
+            } else {
+                throw new Error(`Failed to fetch energy plan (Status: ${response.status})`);
+            }
+        }
+        
+        const data = await response.json();
+        const energyPlanElement = document.getElementById('current-energy-plan');
+        
+        if (data && data.supplierName) {
+            energyPlanElement.textContent = `${data.supplierName} (${data.EEM || '0.00'} EEM)`;
+            energyPlanElement.className = 'stat-value text-green-400';
+        } else {
+            energyPlanElement.textContent = 'No Energy Plan';
+            energyPlanElement.className = 'stat-value text-red-400';
+        }
+    } catch (error) {
+        console.error('Error fetching energy plan:', error);
+        const energyPlanElement = document.getElementById('current-energy-plan');
+        energyPlanElement.textContent = 'Error Loading Plan';
+        energyPlanElement.className = 'stat-value text-red-400';
+    }
+}
+
 async function initializeMiningState() {
     try {
         const options = {
@@ -275,16 +380,19 @@ async function initializeMiningState() {
         if (state.isMining) {
             startPeriodicUpdates();
         }
+        // Fetch current energy plan
+        await fetchCurrentEnergyPlan();
     } catch (error) {
         console.error('Error initializing mining state:', error);
         showNotification('Error loading mining state. Please try again.');
     }
 }
+
 async function startPeriodicUpdates() {
     if (updateInterval) clearInterval(updateInterval);
     updateInterval = setInterval(async () => {
         await updateMiningStats();
-    }, 5000);
+    }, 900000);
     const options = {
         ...fetchOptions,
         method: 'GET',
@@ -304,8 +412,9 @@ async function startPeriodicUpdates() {
         } catch (error) {
             console.error('Real time monitor **FAILED**:', error);
         }
-    }, 5000);
+    }, 900000);
 }
+
 // API Calls
 async function loadGPUs() {
     try {
@@ -322,6 +431,7 @@ async function loadGPUs() {
         console.error('Error loading GPUs:', error);
     }
 }
+
 window.toggleGPU = async function (gpuId) {
     try {
         const options = {
@@ -353,6 +463,7 @@ window.toggleGPU = async function (gpuId) {
         showNotification('Error toggling GPU: ' + error.message);
     }
 }
+
 window.buyGpu = async function (gpuId, quantity) {
     try {
         const options = {
@@ -375,6 +486,7 @@ window.buyGpu = async function (gpuId, quantity) {
         showNotification('Error buying GPU: ' + error.message);
     }
 }
+
 async function updateMiningStats() {
     // Get current cryptocurrency from localStorage or default to BTC
     let currentSymbol = localStorage.getItem('currentMiningCrypto') || 'BTC';
@@ -437,6 +549,7 @@ async function updateMiningStats() {
         showNotification('Failed to fetch mining data, check your connection');
     }
 }
+
 // UI Updates
 function updateDisplay(stats) {
     // Log incoming data
@@ -451,13 +564,17 @@ function updateDisplay(stats) {
     // Calculate and update USD value
     let usdValue;
     if (stats.totalBalanceUSD) {
-        // Use API-provided USD value if available
         usdValue = stats.totalBalanceUSD;
     } else {
-        // Calculate USD value using BTC_PRICE constant
         usdValue = (totalBTC * 45000).toFixed(2);
     }
     document.getElementById('usd-value').textContent = `$${usdValue}`;
+
+    // Calculate daily revenue based on hashrate
+    const hashrate = parseFloat(stats.hashrate) || 0;
+    const dailyRevenue = (hashrate * 86400 * 0.00000001 * 45000).toFixed(2); // Calculate based on hashrate
+    document.getElementById('daily-revenue').textContent = `$${dailyRevenue}`;
+    
     // Log the values being displayed
     console.log('Display values:', {
         btcBalance: btcBalance.toFixed(8),
@@ -479,7 +596,6 @@ function updateDisplay(stats) {
     document.getElementById('shares').textContent = stats.shares || 0;
     document.getElementById('gpu-temp').textContent = `${newTemp.toFixed(1)}°C`;
     document.getElementById('power-draw').textContent = `${newPower.toFixed(0)}W`;
-    document.getElementById('daily-revenue').textContent = `$${(typeof stats.dailyRevenue === 'number' ? stats.dailyRevenue : 0).toFixed(2)}`;
     document.getElementById('power-cost').textContent = `$${(typeof stats.powerCost === 'number' ? stats.powerCost : 0).toFixed(2)}`;
     // Update GPU count display
     if (stats.gpus && stats.gpus.length > 0) {
@@ -502,6 +618,7 @@ function updateDisplay(stats) {
     // Store stats globally for modal access
     window.stats = stats;
 }
+
 function renderGpuInventory(stats) {
     const inventoryElement = document.getElementById('gpu-inventory');
     if (!inventoryElement) return;
@@ -524,10 +641,10 @@ function renderGpuInventory(stats) {
         }
     });
     const container = document.createElement('div');
-    container.className = 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-4';
+    container.className = 'grid grid-cols-1 gap-6 p-4';
     Object.values(gpuGroups).forEach(gpu => {
         const gpuCard = document.createElement('div');
-        gpuCard.className = 'bg-gray-800 rounded-xl p-6 shadow-2xl transform transition-all duration-300 hover:scale-[1.02] border border-gray-700';
+        gpuCard.className = 'bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl p-6 pb-12 shadow-2xl transform transition-all duration-300 hover:scale-[1.02] border border-gray-700/50 backdrop-blur-sm relative';
         gpuCard.dataset.gpuId = gpu.id;
         // Fix property names to match the backend data
         const hashrate = parseFloat(gpu.hashrate) || 0;
@@ -539,44 +656,45 @@ function renderGpuInventory(stats) {
         const dailyProfit = dailyRevenue - dailyPowerCost;
         const sellPrice = (price * 0.8).toFixed(2); // Calculate 80% of original price
         gpuCard.innerHTML = `
-                    <div class="flex flex-col h-full">
-                        <div class="flex-1">
-                            <div class="flex justify-between items-start">
-                                <h3 class="text-xl font-bold text-white">${gpu.name}</h3>
-                                <span class="text-green-400 text-lg font-bold">x${gpu.quantity}</span>
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-8">
+                            <div class="flex-1">
+                                <h3 class="text-xl font-bold text-white mb-1">${gpu.name}</h3>
+                                <p class="text-blue-400/80 text-sm">${gpu.activeCount} of ${gpu.quantity} Active</p>
                             </div>
-                            <p class="text-blue-400 text-sm mb-4">${gpu.activeCount} of ${gpu.quantity} Active</p>
-                            <div class="grid grid-cols-2 gap-4 mt-2">
-                                <div class="text-sm">
-                                    <p class="text-gray-400">Performance (Per GPU)</p>
-                                    <p class="text-white">⚡ ${hashrate.toFixed(2)} MH/s</p>
-                                    <p class="text-white">🔌 ${power.toFixed(0)}W</p>
-                                    <p class="text-white">🌡️ ${temp.toFixed(1)}°C</p>
-                                </div>
-                                <div class="text-sm">
-                                    <p class="text-gray-400">Daily Estimates (Per GPU)</p>
-                                    <p class="text-green-400">💰 $${dailyRevenue.toFixed(2)}</p>
-                                    <p class="text-red-400">💡 -$${dailyPowerCost.toFixed(2)}</p>
-                                    <p class="text-blue-400">📈 $${dailyProfit.toFixed(2)}</p>
-                                </div>
+                            <div class="text-sm bg-gray-800/50 p-3 rounded-lg">
+                                <div class="text-blue-400 font-semibold mb-2">Performance</div>
+                                <p class="text-white/90">⚡ ${hashrate.toFixed(2)} MH/s</p>
+                                <p class="text-white/90">🔌 ${power.toFixed(0)}W</p>
+                                <p class="text-white/90">🌡️ ${temp.toFixed(1)}°C</p>
                             </div>
-                            <div class="mt-4 text-sm">
-                                <p class="text-purple-400">Total Daily Profit: $${(dailyProfit * gpu.quantity).toFixed(2)}</p>
-                                <p class="text-yellow-400">Sell Price: $${sellPrice} each</p>
+                            <div class="text-sm bg-gray-800/50 p-3 rounded-lg">
+                                <div class="text-green-400 font-semibold mb-2">Daily Estimates</div>
+                                <p class="text-green-400/90">💰 $${dailyRevenue.toFixed(2)}</p>
+                                <p class="text-red-400/90">💡 -$${dailyPowerCost.toFixed(2)}</p>
+                                <p class="text-blue-400/90">📈 $${dailyProfit.toFixed(2)}</p>
                             </div>
-                            <div class="mt-4 flex justify-end">
-                                <button onclick="showSellModal(${gpu.id}, '${gpu.name}', ${gpu.quantity}, ${sellPrice})"
-                                        class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition-colors duration-200">
-                                    Sell GPU
-                                </button>
+                            <div class="text-sm bg-gray-800/50 p-3 rounded-lg">
+                                <div class="text-purple-400 font-semibold mb-2">Total & Info</div>
+                                <p class="text-purple-400/90">Total: $${(dailyProfit * gpu.quantity).toFixed(2)}</p>
+                                <p class="text-yellow-400/90">Sell: $${sellPrice}</p>
+                                <p class="text-blue-400/90">Eff: ${(hashrate / power).toFixed(3)} MH/W</p>
                             </div>
                         </div>
+                    </div>
+                    <div class="absolute bottom-4 right-6 flex items-center space-x-3">
+                        <span class="text-green-400/90 text-lg font-bold bg-gray-800/80 px-3 py-1 rounded-lg border border-gray-700/30">x${gpu.quantity}</span>
+                        <button onclick="showSellModal(${gpu.id}, '${gpu.name}', ${gpu.quantity}, ${sellPrice})"
+                                class="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white text-sm px-4 py-2 rounded-lg transition-all duration-200 shadow-lg hover:shadow-red-500/20 transform hover:-translate-y-0.5">
+                            Sell GPU
+                        </button>
                     </div>
                 `;
         container.appendChild(gpuCard);
     });
     inventoryElement.appendChild(container);
 }
+
 function updateCharts(stats) {
     if (!stats) {
         console.warn('updateCharts called without stats');
@@ -618,20 +736,7 @@ function updateCharts(stats) {
         console.log('Profit chart updated');
     }
 }
-function updateMiningButton(isActive) {
-    const button = document.getElementById('start-mining');
-    if (button) {
-        if (isActive) {
-            button.textContent = 'Stop Mining';
-            button.className = 'mining-button start-mining active';
-        } else {
-            button.textContent = 'Start Mining';
-            button.className = 'mining-button start-mining';
-        }
-    } else {
-        console.error('Mining button not found');
-    }
-}
+
 function renderGpuShop(gpus) {
     const gpuListElement = document.getElementById('gpu-list');
     if (!gpuListElement) {
@@ -663,6 +768,7 @@ function renderGpuShop(gpus) {
         });
     });
 }
+
 function createGpuCard(gpu, category) {
     const card = document.createElement('div');
     card.className = `gpu-card mb-4 ${getCategoryClass(category)}`;
@@ -738,6 +844,7 @@ function createGpuCard(gpu, category) {
     }, 0);
     return card;
 }
+
 // Utility functions
 function getCategoryColor(category) {
     const colors = {
@@ -749,6 +856,7 @@ function getCategoryColor(category) {
     };
     return colors[category] || 'text-white';
 }
+
 function getCategoryClass(category) {
     const classes = {
         'Free Starter GPU': 'starter',
@@ -759,27 +867,32 @@ function getCategoryClass(category) {
     };
     return classes[category] || '';
 }
+
 function openGpuShop() {
     const modal = document.getElementById('gpu-shop-modal');
     modal.classList.remove('hidden');
     loadGPUs(); // Load GPUs when opening the shop
 }
+
 window.closeGpuShop = function() {
     const modal = document.getElementById('gpu-shop-modal');
     modal.classList.add('hidden');
 };
+
 // Close modal when clicking outside
 document.getElementById('gpu-shop-modal').addEventListener('click', (e) => {
     if (e.target.id === 'gpu-shop-modal') {
         e.target.classList.add('hidden');
     }
 });
+
 function stopPeriodicUpdates() {
     if (updateInterval) {
         clearInterval(updateInterval);
         updateInterval = null;
     }
 }
+
 // Update the total price function to properly format numbers
 function updateTotalPrice(gpuId, basePrice) {
     const quantitySelect = document.getElementById(`quantity-${gpuId}`);
@@ -790,6 +903,7 @@ function updateTotalPrice(gpuId, basePrice) {
         totalSpan.textContent = total.toLocaleString();
     }
 }
+
 function updateShopTotalCost() {
     let total = 0;
     document.querySelectorAll('[id^="quantity-"]').forEach(select => {
@@ -803,9 +917,11 @@ function updateShopTotalCost() {
     });
     document.getElementById('shop-total-cost').textContent = total.toLocaleString();
 }
+
 // Make the functions globally available
 window.updateTotalPrice = updateTotalPrice;
 window.updateShopTotalCost = updateShopTotalCost;
+
 window.buySelectedGPUs = async function () {
     const purchases = [];
     document.querySelectorAll('[id^="quantity-"]').forEach(select => {
@@ -824,6 +940,7 @@ window.buySelectedGPUs = async function () {
         await buyGpu(purchase.gpuId, purchase.quantity);
     }
 };
+
 // Add sell functionality
 function showSellModal(gpuId, gpuName, maxQuantity, sellPrice) {
     const modal = document.getElementById('sellModal');
@@ -858,14 +975,17 @@ function showSellModal(gpuId, gpuName, maxQuantity, sellPrice) {
     modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
     updateSellTotal(sellPrice);
 }
+
 function updateSellTotal(sellPrice) {
     const quantity = parseInt(document.getElementById('sellQuantity').value) || 0;
     const total = (sellPrice * quantity).toFixed(2);
     document.getElementById('totalSellValue').textContent = total;
 }
+
 function closeSellModal() {
     document.getElementById('sellModal').style.display = 'none';
 }
+
 // Update the confirmSell function with proper headers
 window.confirmSell = async function (gpuId) {
     const quantity = parseInt(document.getElementById('sellQuantity').value);
@@ -894,8 +1014,102 @@ window.confirmSell = async function (gpuId) {
         window.showNotification('Error selling GPU: ' + error.message, true);
     }
 };
+
 window.toggleMining = toggleMining;
 window.showSellModal = showSellModal;
 window.updateSellTotal = updateSellTotal;
 window.closeSellModal = closeSellModal;
 window.confirmSell = confirmSell;
+
+// Update the pool info display function
+function updatePoolInfo(symbol) {
+    const poolInfoElement = document.getElementById('pool-info');
+    if (!poolInfoElement) return;
+
+    // Get pool information based on the cryptocurrency
+    const poolInfo = {
+        'BTC': {
+            algorithm: 'SHA-256',
+            difficulty: 'Very High',
+            minPayout: '0.001 BTC',
+            blockReward: '6.25 BTC'
+        },
+        'ETH': {
+            algorithm: 'Ethash',
+            difficulty: 'High',
+            minPayout: '0.01 ETH',
+            blockReward: '2.0 ETH'
+        },
+        'LTC': {
+            algorithm: 'Scrypt',
+            difficulty: 'Medium',
+            minPayout: '0.02 LTC',
+            blockReward: '12.5 LTC'
+        },
+        'XMR': {
+            algorithm: 'RandomX',
+            difficulty: 'Medium',
+            minPayout: '0.01 XMR',
+            blockReward: '0.6 XMR'
+        }
+    };
+
+    const info = poolInfo[symbol] || poolInfo['BTC']; // Default to BTC if symbol not found
+    poolInfoElement.innerHTML = `
+        <div class="text-sm">
+            <p class="text-blue-400">Mining: ${symbol}</p>
+            <p class="text-gray-400">Algorithm: ${info.algorithm}</p>
+            <p class="text-gray-400">Difficulty: ${info.difficulty}</p>
+            <p class="text-yellow-400">Min Payout: ${info.minPayout}</p>
+            <p class="text-green-400">Block Reward: ${info.blockReward}</p>
+        </div>
+    `;
+}
+
+// Update the selectCryptocurrency function to include pool info update
+window.selectCryptocurrency = function(symbol) {
+    console.log(`Selecting cryptocurrency: ${symbol}`);
+    localStorage.setItem('currentMiningCrypto', symbol);
+    
+    // Update pool information
+    updatePoolInfo(symbol);
+    
+    const selectionUrl = `${javaURI}/api/mining/cryptocurrencies`;
+    console.log("Sending to endpoint:", selectionUrl);
+    fetch(selectionUrl, {
+        method: 'POST'
+    })
+    .then(response => {
+        console.log('Response status:', response.status);
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log('Received selection response:', data);
+        if (data.success) {
+            showNotification(`Now mining ${symbol}`, 'success');
+            loadCryptoBalances();
+            updateMiningStats();
+        } else {
+            showNotification(`Failed to select ${symbol}`, 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error selecting cryptocurrency:', error);
+        showNotification(`Now mining ${symbol} (simulated)`, 'success');
+        document.getElementById('crypto-balances-container').querySelectorAll('.text-blue-400').forEach(el => {
+            if (el.textContent.includes('Currently mining:')) {
+                el.innerHTML = `Currently mining: <span class="font-bold">${symbol}</span>`;
+            }
+        });
+        updateMiningStats();
+    });
+};
+
+// Initialize pool info on page load
+document.addEventListener('DOMContentLoaded', () => {
+    const currentSymbol = localStorage.getItem('currentMiningCrypto') || 'BTC';
+    updatePoolInfo(currentSymbol);
+});

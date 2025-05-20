@@ -84,10 +84,6 @@
         <h3><a href="https://spring2025.nighthawkcodingsociety.com">Teacher Toolkit</a></h3>
     </li>
 
-    <li id="calendar-link">
-        <h3><a href="{{site.baseurl}}/student/calendar">Calendar</a></h3>
-    </li>
-
     <li id="sign-out-link">
         <h3><a href="{{site.baseurl}}/logoutjava">Sign Out</a></h3>
     </li>
@@ -122,7 +118,6 @@
                 const profileLink = document.getElementById('profile-link');
                 const studentToolkitLink = document.getElementById('student-toolkit-link');
                 const teacherToolkitLink = document.getElementById('teacher-toolkit-link');
-                const calendarLink = document.getElementById('calendar-link');
                 const signOutLink = document.getElementById('sign-out-link');
 
                 // these ones only show if you are NOT logged in
@@ -141,7 +136,6 @@
                     // only when the user is logged in can they access the toolkits
                     profileLink.style.display = 'block';
                     studentToolkitLink.style.display = 'block';
-                    calendarLink.style.display = 'block';
 
                     // if the person who is logged in has the teacher role, display "Teacher Toolkit"
                     const isTeacher = data.roles.some(role => role.name === 'ROLE_TEACHER');
