@@ -1,9 +1,11 @@
 ---
 layout: post 
 title: Course Descriptions
-description: An Open Pathway to Computer Science
+description: An overview of Computer Science pathway at Del Norte High School
+author: John Mortensen, Vivian Ni, Bria Gilliam
 image: /images/mario_animation.png
 hide: true
+menu: nav/home.html
 ---
 
 <!-- Liquid:  statements-->
@@ -240,11 +242,11 @@ hide: true
 
 </script>
 
-## Technical Future
+## Investing in Your Technical Future
 
-Computer Science can be "Wild Card" for all Majors and Careers.
+Computer Science is the Wild Card for all Majors and Careers.
 
-> Invest in your technical skills through Project-based learning.
+> Explore the Computer Science Pathway at Del Norte High School and invest in your technical skills.
 
 <div style="display: flex; align-items: flex-start;">
 
@@ -252,12 +254,12 @@ Computer Science can be "Wild Card" for all Majors and Careers.
 <tr>
   <td>
     <div style="flex: 65%; text-align: left;">
-      <p>All Open Coding Society materials are designed to provide real-world development experiences.</p>
+      <p>All Del Norte CompSci classes are designed to provide real-world development experiences.</p>
       <ul>
-        <li> Project talks between instructor and students</li>
-        <li> Teaching through interactive Tech talks (versus lectures) </li>
+        <li> Project talks between teachers and students</li>
+        <li> Teaching through Tech talks (versus lectures) </li>
         <li> Peer collaboration using GitHub Issues and Kanban boards </li>
-        <li> Critical thinking while learning fundamentals of coding </li>
+        <li> Critical thinking while performing iterative coding </li>
         <li> Creativity and designs in projects, as well as code </li>
       </ul>
     </div>
@@ -274,17 +276,17 @@ Computer Science can be "Wild Card" for all Majors and Careers.
 
 ## Project-based learning
 
-Intructor created projects, project requirements, technical materials, and support.
+Teacher created projects, project requirements, technical materials, and support.
 
-> Grades are based on projects, time invested, engagement, learned concepts, participation with peers, and live reviews between student(s) and instructor.
+> Grades are based on projects, time invested, engagement, learned concepts, participation with peers, and live reviews between student(s) and teacher.
 
 - Performing Agile/Scrum development
-- Coding, frontend, backend, devops, version control, and using algorithmic thinking
+- Coding, frontend, backend, devops, version control, and algorithmic thinking
 - Creativity, research, design, data structures, and utilizing ChatGPT
 - Performing teamwork, team communication and collaboration, peer reviews/grading
 - Focus on technical communications through project presentations and student-led teaching
 
-> Classroom work time is 3-4 hours per week. Homework expectations are approximately 2-3 hours per week. Homework is scheduled over a Sprint, approximately 2-4 weeks. Time lost in class extremely hard to make up as working with team meembers, progressing project,  checkpoint reviews and all the cumulative progress is hard to replicate.
+> Classroom work time is 3-4 hours per week. Homework expectations are approximately 2-3 hours per week. Homework is scheduled over a Sprint, approximately 2-4 weeks. Time lost is extremely hard to make up as all materials are cumulative.
 
 ![ccr]({{site.baseurl}}/images/course-brag/ccr.png)
 
@@ -320,7 +322,7 @@ Computer Science Principles is designed as a college-level introduction to compu
 
 ## Computer Science "A" 1,2 and Data Structures 2; Grades 11-12
 
-AP Computer Science A is an in-depth course that focuses on programming, algorithms, and data structures. The AP Computer Science 'A' curriculum is integrated into this course, which covers the Java programming language and topics such as fundamentals of programming, using objects, writing classes, arrays, array lists, 2D arrays, inheritance, and recursion.
+AP Computer Science A is an in-depth course that focuses on programming, algorithms, and data structures. The AP Computer Science 'A' curriculum is integrated into this course, which covers the Java programming language and topics such as fundamentals of programming, using objects, writing classes, arrays, array lists, 2D arrays, inheritance, and recursion. 
 
 > Students will gain understanding through analysis, coding, and individual and team projects. The course will establish fluency in Java, utilize JavaScript, and work with Linux.
 
@@ -336,3 +338,4 @@ AP Computer Science A is an in-depth course that focuses on programming, algorit
 - Data Structures 1,2 receives Articulated College Credit to Mira Costa CC for "CS 113: Basic Data Structures and Algorithms". Mira Costa CC requires and provides free registration to receive UC college credit.
 
 ![csa]({{site.baseurl}}/images/course-brag/csa24.png)
+

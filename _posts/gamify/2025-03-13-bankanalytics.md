@@ -1,5 +1,5 @@
 ---
-layout: fortunefinders
+layout: finance
 title: Bank Analytics
 permalink: /gamify/bankanalytics
 ---
@@ -9,23 +9,19 @@ permalink: /gamify/bankanalytics
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
     .chart-container {
-        height: 500px;
+        height: 300px;
         position: relative;
-        overflow: visible;
     }
     .combined-chart-container {
-        height: 600px;
+        height: 400px;
     }
     .game-card {
         background-color: #1f1f1f;
         border-radius: 8px;
         transition: transform 0.3s;
-        position: relative;
-        z-index: 1;
     }
     .game-card:hover {
         transform: translateY(-5px);
-        z-index: 1000;
     }
     .game-title {
         color: #ff9800;
@@ -39,23 +35,11 @@ permalink: /gamify/bankanalytics
     .toggle-container button {
         margin: 0.2rem;
     }
-    .chart-container canvas {
-        transition: transform 0.3s ease;
-    }
-    .game-card:hover .chart-container canvas {
-        transform: scale(1.8);
-        transform-origin: center center;
-    }
 </style>
 <body class="m-0 p-0" style="font-family: 'Poppins', sans-serif; background-color: #121212; color: #fff;">
 
 <br>
 <h1 class="text-center">Game Analytics</h1>
-
-<div class="container text-center my-4">
-    <h4>User ID: <span class="name">Loading...</span></h4>
-    <h4>Current Balance: $<span class="balance">0.00</span></h4>
-</div>
 
 <!-- Combined Chart -->
 <div class="container my-4">
@@ -66,8 +50,6 @@ permalink: /gamify/bankanalytics
             <button class="btn btn-sm btn-outline-info" onclick="window.toggleDataset('Blackjack')">Blackjack</button>
             <button class="btn btn-sm btn-outline-light" onclick="window.toggleDataset('Dice')">Dice</button>
             <button class="btn btn-sm btn-outline-primary" onclick="window.toggleDataset('Mines')">Mines</button>
-            <button class="btn btn-sm btn-outline-success" onclick="window.toggleDataset('Stocks')">Stocks</button>
-            <button class="btn btn-sm btn-outline-cyan" onclick="window.toggleDataset('Crypto')">Crypto</button>
         </div>
         <div class="combined-chart-container mt-3">
             <canvas id="combinedChart"></canvas>
@@ -78,26 +60,10 @@ permalink: /gamify/bankanalytics
 <!-- Charts Grid -->
 <div class="container my-4">
     <div class="row g-4">
-        <div class="col-12 col-md-6 col-lg-6" id="pokerChartContainer"></div>
-        <div class="col-12 col-md-6 col-lg-6" id="blackjackChartContainer"></div>
-        <div class="col-12 col-md-6 col-lg-6" id="diceChartContainer"></div>
-        <div class="col-12 col-md-6 col-lg-6" id="casino_minesChartContainer"></div>
-        <div class="col-12 col-md-6 col-lg-6">
-            <div class="game-card p-3 h-100">
-                <h3 class="game-title">Crypto Portfolio</h3>
-                <div class="chart-container mt-3">
-                    <canvas id="cryptoPortfolioGraph"></canvas>
-                </div>
-            </div>
-        </div>
-        <div class="col-12 col-md-6 col-lg-6">
-            <div class="game-card p-3 h-100">
-                <h3 class="game-title">Stock Portfolio</h3>
-                <div class="chart-container mt-3">
-                    <canvas id="stocksChart"></canvas>
-                </div>
-            </div>
-        </div>
+        <div class="col-12 col-md-6 col-lg-3" id="pokerChartContainer"></div>
+        <div class="col-12 col-md-6 col-lg-3" id="blackjackChartContainer"></div>
+        <div class="col-12 col-md-6 col-lg-3" id="diceChartContainer"></div>
+        <div class="col-12 col-md-6 col-lg-3" id="casino_minesChartContainer"></div>
     </div>
 </div>
 
@@ -105,9 +71,12 @@ permalink: /gamify/bankanalytics
 import { javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
 
 let userId = null;
-let combinedChart = null;
 const charts = {};
+let combinedChart = null;
 
+/**
+ * Mapping of internal game keys to display labels.
+ */
 const gameMap = {
     poker: 'Poker',
     blackjack: 'Blackjack',
@@ -115,15 +84,20 @@ const gameMap = {
     casino_mines: 'Mines'
 };
 
+/**
+ * Color palette for game charts.
+ */
 const gameColors = {
     poker: '#FF6384',
     blackjack: '#4BC0C0',
     dice: '#FFCE56',
-    casino_mines: '#9966FF',
-    crypto: '#00FFFF',
-    stocks: '#28a745'
+    casino_mines: '#9966FF'
 };
 
+/**
+ * Fetch the current user's profile data and trigger chart initialization.
+ * Updates DOM with UID and balance.
+ */
 async function fetchUserDetails() {
     try {
         const response = await fetch(`${javaURI}/api/person/get`, fetchOptions);
@@ -131,25 +105,31 @@ async function fetchUserDetails() {
         userId = userData.id;
         document.querySelector('.name').textContent = userData.uid || "Unknown";
         document.querySelector('.balance').textContent = Number(userData.balance).toFixed(2);
-        initializeCharts(userData.email);
+        initializeCharts();
     } catch (error) {
         console.error("Error fetching user data:", error);
         document.querySelector('.name').textContent = "Error";
     }
 }
 
-async function initializeCharts(email) {
+/**
+ * Initialize all game charts by fetching transaction history.
+ */
+async function initializeCharts() {
     const games = Object.keys(gameMap);
-    
+
     const gameData = await Promise.all(games.map(async (game) => {
         try {
-            const endpoint = game === 'casino_mines' 
-                ? `${javaURI}/bank/${userId}/profitmap/casino_mines`
-                : `${javaURI}/bank/${userId}/profitmap/${game}`;
-                
-            const response = await fetch(endpoint, { ...fetchOptions, method: 'GET' });
+            const response = await fetch(`${javaURI}/bank/${userId}/profitmap/${game}`, {
+                ...fetchOptions,
+                method: 'GET'
+            });
             const result = response.ok ? await response.json() : [];
-            return { game, data: result };
+            console.log(`Fetched ${game} data:`, result);
+            return {
+                game,
+                data: result
+            };
         } catch (error) {
             console.error(`Failed to fetch ${game}:`, error);
             return { game, data: [] };
@@ -161,63 +141,76 @@ async function initializeCharts(email) {
         createChart(game, data);
     });
 
-    const crypto = await buildCryptoPortfolioChart(email);
-    const stocks = await buildStockPortfolioChart(email);
-
-    createCombinedChart([...gameData, 
-        { game: 'crypto', data: crypto }, 
-        { game: 'stocks', data: stocks }
-    ]);
+    createCombinedChart(gameData);
 }
 
+/**
+ * Render chart HTML card for an individual game.
+ * @param {string} game - Game key name.
+ */
 function renderChartCard(game) {
     const containerId = `${game}ChartContainer`;
-    const container = document.getElementById(containerId);
-    if (container) {
-        container.innerHTML = `
+    document.getElementById(containerId).innerHTML = `
         <div class="game-card p-3 h-100">
             <h3 class="game-title">${gameMap[game]}</h3>
             <div class="chart-container mt-3">
                 <canvas id="${game}Chart"></canvas>
             </div>
-        </div>`;
-    }
+        </div>
+    `;
 }
 
+/**
+ * Create a line chart for a specific game using Chart.js.
+ * @param {string} game - Game key.
+ * @param {Array} transactions - List of [timestamp, profit] pairs.
+ */
 function createChart(game, transactions) {
     const processed = processChartData(game, transactions);
     if (!processed) return;
-    const ctx = document.getElementById(`${game}Chart`)?.getContext('2d');
-    if (!ctx) return;
+    const ctx = document.getElementById(`${game}Chart`).getContext('2d');
     if (charts[game]) charts[game].destroy();
     charts[game] = new Chart(ctx, {
         type: 'line',
         data: processed,
-        options: { ...getChartOptions(game), maintainAspectRatio: false }
+        options: getChartOptions(game)
     });
 }
 
+/**
+ * Build a combined chart showing cumulative balances across all games.
+ * @param {Array} gameData - Array of game and data pairs.
+ */
 function createCombinedChart(gameData) {
     const labelSet = new Set();
     gameData.forEach(({ data }) => {
-        data.forEach(([date]) => labelSet.add(new Date(date).toLocaleDateString()));
+        data.forEach(([date]) => {
+            labelSet.add(new Date(date).toLocaleDateString());
+        });
     });
     const labels = Array.from(labelSet).sort((a, b) => new Date(a) - new Date(b));
 
     const datasets = gameData.map(({ game, data }) => {
         const dailyMap = {};
         let cumBal = 0;
+
         data.forEach(([time, profit]) => {
             const key = new Date(time).toLocaleDateString();
-            cumBal += parseFloat(profit) || 0;
+            const value = parseFloat(profit) || 0;
+            cumBal += value;
             dailyMap[key] = cumBal;
         });
+
+        const points = labels.map(label => dailyMap[label] ?? null);
+
         return {
-            label: gameMap[game] || game.charAt(0).toUpperCase() + game.slice(1),
-            data: labels.map(label => dailyMap[label] ?? null),
+            label: gameMap[game],
+            data: points,
             borderColor: gameColors[game],
-            backgroundColor: gameColors[game] + '30',
+            backgroundColor: `${gameColors[game]}30`,
             tension: 0.2,
+            fill: false,
+            spanGaps: true,
             hidden: false
         };
     });
@@ -231,6 +224,10 @@ function createCombinedChart(gameData) {
     });
 }
 
+/**
+ * Globally accessible toggle for hiding/showing datasets in the combined chart.
+ * @param {string} label - The display name of the game.
+ */
 window.toggleDataset = function(label) {
     const ds = combinedChart.data.datasets.find(d => d.label === label);
     if (ds) {
@@ -239,10 +236,18 @@ window.toggleDataset = function(label) {
     }
 };
 
+/**
+ * Transform transaction data into chart-ready datasets.
+ * @param {string} game - Game key.
+ * @param {Array} transactions - Raw transaction array.
+ * @returns {object} Chart.js compatible data object.
+ */
 function processChartData(game, transactions) {
     if (!Array.isArray(transactions) || transactions.length === 0) return null;
-    const labels = [], profits = [];
+    const labels = [];
+    const profits = [];
     let balance = 0;
+
     transactions.forEach(transaction => {
         if (Array.isArray(transaction)) {
             const date = new Date(transaction[0]).toLocaleDateString();
@@ -251,7 +256,9 @@ function processChartData(game, transactions) {
             profits.push(profit);
         }
     });
+
     const cumulative = profits.map(p => (balance += p));
+
     return {
         labels,
         datasets: [
@@ -259,20 +266,30 @@ function processChartData(game, transactions) {
                 label: 'Profit/Loss',
                 data: profits,
                 borderColor: gameColors[game],
-                backgroundColor: gameColors[game] + '30',
-                tension: 0.2
+                backgroundColor: `${gameColors[game]}30`,
+                borderDash: [5, 5],
+                tension: 0.2,
+                fill: false,
+                spanGaps: true
             },
             {
                 label: 'Cumulative Balance',
                 data: cumulative,
                 borderColor: gameColors[game],
-                backgroundColor: gameColors[game] + '10',
-                tension: 0.2
+                backgroundColor: `${gameColors[game]}10`,
+                tension: 0.2,
+                fill: true,
+                spanGaps: true
             }
         ]
     };
 }
 
+/**
+ * Returns a Chart.js configuration object.
+ * @param {string} game - Game key (used for styling).
+ * @returns {object} Chart options.
+ */
 function getChartOptions(game) {
     return {
         responsive: true,
@@ -281,19 +298,16 @@ function getChartOptions(game) {
             legend: { labels: { color: '#fff' } },
             tooltip: {
                 callbacks: {
-                    label: ctx => `${ctx.dataset.label}: $${ctx.raw?.toFixed(2)}`
+                    label: (ctx) => `${ctx.dataset.label}: $${ctx.raw?.toFixed(2)}`
                 }
             }
         },
         scales: {
-            x: { 
-                ticks: { color: '#fff' }, 
-                grid: { color: 'rgba(255,255,255,0.1)' } 
-            },
+            x: { ticks: { color: '#fff' }, grid: { color: 'rgba(255,255,255,0.1)' } },
             y: {
-                ticks: { 
-                    color: '#fff', 
-                    callback: val => `$${val.toFixed(2)}` 
+                ticks: {
+                    color: '#fff',
+                    callback: (val) => `$${val.toFixed(2)}`
                 },
                 grid: { color: 'rgba(255,255,255,0.1)' }
             }
@@ -301,74 +315,7 @@ function getChartOptions(game) {
     };
 }
 
-async function buildCryptoPortfolioChart(email) {
-    try {
-        const res = await fetch(`${javaURI}/api/crypto/holdings?email=${encodeURIComponent(email)}`, fetchOptions);
-        if (!res.ok) return [];
-        const holdingsData = await res.json();
-        const holdings = Object.fromEntries(
-            holdingsData.holdings.split(',').map(s => {
-                const [symbol, amt] = s.split(':');
-                return [symbol.trim().toUpperCase(), parseFloat(amt.trim())];
-            })
-        );
-        const trend = Array(7).fill(0);
-        for (const [symbol, amt] of Object.entries(holdings)) {
-            const tr = await fetch(`${javaURI}/api/crypto/trend?cryptoId=${symbol}&days=7`, fetchOptions);
-            if (!tr.ok) continue;
-            const td = await tr.json();
-            for (let i = 0; i < 7; i++) trend[i] += (td[i] || 0) * amt;
-        }
-        const ctx = document.getElementById('cryptoPortfolioGraph')?.getContext('2d');
-        if (ctx) new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: ['6d ago', '5d', '4d', '3d', '2d', '1d', 'Today'],
-                datasets: [{
-                    label: 'Portfolio Value ($)',
-                    data: trend.map(v => v.toFixed(2)),
-                    borderColor: gameColors.crypto,
-                    backgroundColor: gameColors.crypto + '10',
-                    tension: 0.2
-                }]
-            },
-            options: getChartOptions('crypto')
-        });
-        return trend.map((v, i) => [Date.now() - (6 - i) * 86400000, v]);
-    } catch (e) { 
-        console.error('Crypto fetch error:', e); 
-        return []; 
-    }
-}
-
-async function buildStockPortfolioChart(email) {
-    try {
-        const res = await fetch(`${javaURI}/api/stocks/portfolio/trend?email=${email}`, fetchOptions);
-        if (!res.ok) return [];
-        const trend = await res.json();
-        const ctx = document.getElementById('stocksChart')?.getContext('2d');
-        if (ctx) new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: ['6d ago', '5d', '4d', '3d', '2d', '1d', 'Today'],
-                datasets: [{
-                    label: 'Stock Portfolio ($)',
-                    data: trend.map(v => v.toFixed(2)),
-                    borderColor: gameColors.stocks,
-                    backgroundColor: gameColors.stocks + '10',
-                    tension: 0.2
-                }]
-            },
-            options: getChartOptions('stocks')
-        });
-        return trend.map((v, i) => [Date.now() - (6 - i) * 86400000, v]);
-    } catch (e) { 
-        console.error('Stocks fetch error:', e);
-        return []; 
-    }
-}
-
-document.addEventListener('DOMContentLoaded', fetchUserDetails);
+document.addEventListener("DOMContentLoaded", fetchUserDetails);
 </script>
 </body>
 </html>

@@ -1,5 +1,5 @@
 ---
-layout: fortunefinders
+layout: finance
 title: Crypto Portfolio
 type: issues
 permalink: /crypto/portfolio

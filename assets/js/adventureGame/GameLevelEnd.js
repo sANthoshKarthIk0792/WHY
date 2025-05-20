@@ -299,10 +299,12 @@ class GameLevelEnd {
           // Add more later?
         ],
         reaction: function() {
-          //sient reaction for interaction to work
+          dialogueSystem.showRandomDialogue(); // Using Dialogue system instead of alert
         },
         interact: function() {
-          dialogueSystem.showRandomDialogue(); // Using Dialogue system instead of alert
+          let quiz = new Quiz();
+          quiz.initialize();
+          quiz.openPanel(sprite_data_endship);
         }
     };
 
@@ -329,7 +331,7 @@ class GameLevelEnd {
             "This Eye of Ender whispers secrets of distant realms."
         ],
         reaction: function() {
-            // Silent reaction, dialogue only apepars on interaction
+            // Silent reaction - we'll handle dialogue in interact
         },
         interact: function() {
             // IMPORTANT: First check if the player is actually near the eye

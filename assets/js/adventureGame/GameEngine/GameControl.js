@@ -18,7 +18,7 @@ class GameControl {
         this.currentLevelIndex = 0;
         this.gameLoopCounter = 0;
         this.isPaused = false;
-        this.nextLevelKeyListener = this.handleNextLevelKey.bind(this);
+        this.exitKeyListener = this.handleExitKey.bind(this);
         this.gameOver = null; // Callback for when the game is over 
         this.savedCanvasState = []; // Save the current levels game elements 
         
@@ -78,17 +78,9 @@ class GameControl {
         // Clean up any lingering interaction handlers
         this.cleanupInteractionHandlers();
 
-        // Create new level
         const GameLevelClass = this.levelClasses[this.currentLevelIndex];
         this.currentLevel = new GameLevel(this);
-        
-        // Initialize the new level
         this.currentLevel.create(GameLevelClass);
-        
-        // Ensure we're not paused
-        this.isPaused = false;
-        
-        // Start the game loop
         this.gameLoop();
     }
 
@@ -139,24 +131,16 @@ class GameControl {
             alert("All levels completed.");
         }
         
-        // Store reference to current level before cleanup
-        const oldLevel = this.currentLevel;
-        
         // Clean up any lingering interaction handlers
         this.cleanupInteractionHandlers();
         
-        // Destroy the current level
-        if (oldLevel) {
-            oldLevel.destroy();
-        }
+        this.currentLevel.destroy();
         
         // Call the gameOver callback if it exists
         if (this.gameOver) {
             this.gameOver();
         } else {
             this.currentLevelIndex++;
-            // Ensure we're not paused before transitioning
-            this.isPaused = false;
             this.transitionToLevel();
         }
     }
@@ -165,17 +149,12 @@ class GameControl {
      * Exit key handler to end the current level
      * @param {*} event - The keydown event object
      */
-    handleNextLevelKey(event) {
-        if (event.key.toLowerCase() === 't' || event.key.toLowerCase() === 'Escape') {
-            if (this.currentLevelIndex < this.levelClasses.length - 1) {
-                console.log("Hotkey 't' pressed: Transitioning to next level.");
-                this.currentLevel.continue = false;
-            } else {
-                alert("🎉 You're on the final level! There are no more levels to transition to.");
-            }
+    handleExitKey(event) {
+        if (event.key === 'Escape') {
+            this.currentLevel.continue = false;
         }
     }
-    
+
     // Helper method to add exit key listener
     addExitKeyListener() {
         document.addEventListener('keydown', this.exitKeyListener);
