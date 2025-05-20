@@ -11,25 +11,6 @@ const InputHandler = {
         down: false,
         left: false,
         right: false,
-        attack: false,
-        basicSkill: false,
-        specialSkill: false,
-        ultimateSkill: false,
-        
-        // Player 2 controls (Arrow keys)
-        up2: false,
-        down2: false,
-        left2: false,
-        right2: false,
-        attack2: false,
-        basicSkill2: false,
-        specialSkill2: false,
-        ultimateSkill2: false,
-        
-        // Player 2 skill keys (, . /)
-        basicSkillKey2: false,
-        specialSkillKey2: false,
-        ultimateSkillKey2: false
     },
     
     /**
@@ -62,49 +43,6 @@ const InputHandler = {
      * Setup all UI button event listeners
      */
     setupUIButtons: function() {
-        // Main menu buttons
-        document.getElementById('singleplayer-btn').addEventListener('click', () => {
-            this.game.setGameState(CONFIG.STATES.CHARACTER_SELECT);
-            this.game.isMultiplayer = false;
-        });
-        
-        document.getElementById('multiplayer-btn').addEventListener('click', () => {
-            this.game.setGameState(CONFIG.STATES.CHARACTER_SELECT);
-            this.game.isMultiplayer = true;
-        });
-        
-        document.getElementById('settings-btn').addEventListener('click', () => {
-            // Toggle debug mode for now
-            CONFIG.GAME.DEBUG_MODE = !CONFIG.GAME.DEBUG_MODE;
-            alert('Debug mode: ' + (CONFIG.GAME.DEBUG_MODE ? 'Enabled' : 'Disabled'));
-        });
-        
-        // Character select buttons
-        document.getElementById('start-game-btn').addEventListener('click', () => {
-            const selectedCard = document.querySelector('.character-card.selected');
-            if (selectedCard) {
-                const characterType = selectedCard.dataset.character.toUpperCase();
-                this.game.startGame(characterType, this.game.isMultiplayer);
-            } else {
-                alert('Please select a character');
-            }
-        });
-        
-        document.getElementById('back-to-menu-btn').addEventListener('click', () => {
-            this.game.setGameState(CONFIG.STATES.MAIN_MENU);
-        });
-        
-        // Character cards
-        const characterCards = document.querySelectorAll('.character-card');
-        characterCards.forEach(card => {
-            card.addEventListener('click', () => {
-                // Remove selected class from all cards
-                characterCards.forEach(c => c.classList.remove('selected'));
-                // Add selected class to clicked card
-                card.classList.add('selected');
-            });
-        });
-        
         // Game screen buttons
         document.getElementById('pause-btn').addEventListener('click', () => {
             if (this.game.currentState === CONFIG.STATES.PLAYING) {

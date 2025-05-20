@@ -1,5 +1,5 @@
 /**
- * CS Fighters - Game Engine
+ * Platformer Game Engine
  * Main game logic and rendering
  */
 
@@ -12,34 +12,18 @@ class Game {
         // Set canvas size based on window size
         this.canvas.width = window.innerWidth;
         this.canvas.height = window.innerHeight;
-        
-        // Camera (for larger arena)
-        this.camera = {
-            x: 0,
-            y: 0,
-            width: this.canvas.width,
-            height: this.canvas.height,
-            following: null // Object to follow
-        };
-        
+    
         // Game state
-        this.currentState = CONFIG.STATES.MAIN_MENU;
+        this.currentState = CONFIG.STATES.PLAYING;
         this.lastTime = 0;
-        this.animationFrameId = null;
-        this.statusMessage = document.getElementById('status-message');
         
         // Game objects
         this.player = null;
-        this.targetDummy = null;
-        this.selectedCharacterType = 'PYRO'; // Default character
+        //room for enemies here
         
         // Initialize input handler
         InputHandler.init(this);
-        
-        // Show main menu
-        this.showMainMenu();
-        
-        // Make game instance globally accessible (for projectile manager)
+        // Make game instance globally accessible
         window.game = this;
         
         // Start game loop
@@ -53,10 +37,7 @@ class Game {
      */
     setGameState(state) {
         this.currentState = state;
-        
-        // Hide all screens
-        document.getElementById('main-menu').classList.add('hidden');
-        document.getElementById('character-select').classList.add('hidden');
+    
         document.getElementById('game-screen').classList.add('hidden');
         document.getElementById('pause-screen').classList.add('hidden');
         
