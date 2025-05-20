@@ -2,8 +2,8 @@ title: Open Coding
 description: "Class of 2025"
 owner_name: John Mortensen
 github_username: nighthawkcoders
-github_repo: "portfolio_2025" 
-baseurl: "/portfolio_2025"
+github_repo: "CSSE2-Hacks2" 
+baseurl: "/CSSE2-Hacks2"
 future: true
 remote_theme: jekyll/minima
 minima:
@@ -21,9 +21,6 @@ plugins:
   - jekyll-remote-theme
   - jekyll-include-cache
 header_pages:
-  - navigation/section/csse.md
-  - navigation/section/csp.md
-  - navigation/section/csa.md 
   - navigation/blog.md
   - navigation/search.md
   - navigation/logintoolkit.md

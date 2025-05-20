@@ -26,7 +26,7 @@ class HelpPanel {
     panel.innerHTML = `
       <h2>Help & Instructions</h2>
       <ul style="line-height: 1.6;">
-        <li><b>Objective:</b> Talk to some companies, then talk to the pilot and board the plane to Wallstreet!</li>
+        <li><b>Objective:</b> Talk to the pilot and board the plane to Silicon Valley!</li>
         <li><b>WASD</b> — Move around</li>
         <li><b>E</b> — Interact with characters</li>
         <li><b>H</b> — Toggle this help panel</li>

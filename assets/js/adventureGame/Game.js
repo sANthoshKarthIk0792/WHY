@@ -149,9 +149,6 @@ class StatsManager {
         document.head.appendChild(fontLink);
         
         document.body.appendChild(statsContainer);
-
-        // Show initial guidance
-        this.showNextStepGuidance();
     }
     
     // Create a styled stopwatch
