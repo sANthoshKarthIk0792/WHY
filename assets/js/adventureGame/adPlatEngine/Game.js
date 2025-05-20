@@ -49,6 +49,7 @@ class Game {
     /**
      * Sets the game state and updates UI
      * @param {String} state - New game state
+     * 
      */
     setGameState(state) {
         this.currentState = state;
@@ -61,12 +62,6 @@ class Game {
         
         // Show appropriate screen
         switch (state) {
-            case CONFIG.STATES.MAIN_MENU:
-                document.getElementById('main-menu').classList.remove('hidden');
-                break;
-            case CONFIG.STATES.CHARACTER_SELECT:
-                document.getElementById('character-select').classList.remove('hidden');
-                break;
             case CONFIG.STATES.PLAYING:
                 document.getElementById('game-screen').classList.remove('hidden');
                 break;
@@ -75,90 +70,6 @@ class Game {
                 document.getElementById('pause-screen').classList.remove('hidden');
                 break;
         }
-    }
-    
-    /**
-     * Shows main menu
-     */
-    showMainMenu() {
-        this.setGameState(CONFIG.STATES.MAIN_MENU);
-        
-        // Clear any existing game objects
-        this.player = null;
-        this.targetDummy = null;
-        ProjectileManager.clear();
-    }
-    
-    /**
-     * Starts the game with selected character
-     * @param {String} characterType - Character type from CONFIG.CHARACTERS
-     * @param {Boolean} isMultiplayer - Indicates if the game is multiplayer
-     */
-    startGame(characterType, isMultiplayer = false) {
-        // Set state
-        this.setGameState(CONFIG.STATES.PLAYING);
-        this.statusMessage.textContent = 'Fight!';
-        
-        // Store selected character
-        this.selectedCharacterType = characterType || 'PYRO';
-        
-        if (isMultiplayer) {
-            // Create both players with different starting positions
-            this.player1 = new Player(characterType, 1);
-            this.player2 = new Player(characterType, 2);
-            
-            // Set player references to game
-            this.player1.setGameReference(this);
-            this.player2.setGameReference(this);
-            
-            // Set initial positions
-            this.player1.x = CONFIG.PLAYER.START_X;
-            this.player1.y = CONFIG.ENVIRONMENT.FLOOR_Y - this.player1.height;
-            
-            this.player2.x = CONFIG.CANVAS.WIDTH - CONFIG.PLAYER.START_X - CONFIG.PLAYER.WIDTH;
-            this.player2.y = CONFIG.ENVIRONMENT.FLOOR_Y - this.player2.height;
-            
-            // Set camera to follow both players
-            this.camera.following = [this.player1, this.player2];
-            
-            // Set player names in UI
-            document.getElementById('player1-name').textContent = this.player1.name;
-            document.getElementById('player2-name').textContent = this.player2.name;
-            
-            // Reset health bars
-            document.getElementById('player1-health').style.width = '100%';
-            document.getElementById('player2-health').style.width = '100%';
-        } else {
-            // Single player mode with target dummy
-            this.player1 = new Player(characterType, 1);
-            this.targetDummy = new TargetDummy();
-            
-            // Set player references to game
-            this.player1.setGameReference(this);
-            this.targetDummy.setGameReference(this);
-            
-            // Set initial positions
-            this.player1.x = CONFIG.PLAYER.START_X;
-            this.player1.y = CONFIG.ENVIRONMENT.FLOOR_Y - this.player1.height;
-            
-            this.targetDummy.x = CONFIG.TARGET_DUMMY.X;
-            this.targetDummy.y = CONFIG.ENVIRONMENT.FLOOR_Y - this.targetDummy.height;
-            
-            // Set camera to follow player
-            this.camera.following = [this.player1];
-            
-            // Set player name in UI
-            document.getElementById('player1-name').textContent = this.player1.name;
-            document.getElementById('player2-name').textContent = 'Target Dummy';
-            
-            // Reset health bars
-            document.getElementById('player1-health').style.width = '100%';
-            document.getElementById('player2-health').style.width = '100%';
-        }
-        
-        // Clear input state and projectiles
-        InputHandler.clearAll();
-        ProjectileManager.clear();
     }
     
     /**
@@ -184,36 +95,9 @@ class Game {
      * Exits game and returns to main menu
      */
     exitToMenu() {
-        this.showMainMenu();
+        //replace this comment with somethign to return the player to gamelevelend or wheverer they enter the game from
     }
     
-    /**
-     * Update camera position to follow target
-     */
-    updateCamera() {
-        if (!this.camera.following || !this.camera.following[0] || !this.camera.following[1]) return;
-        
-        // Calculate center point between both players
-        const centerX = (this.camera.following[0].x + this.camera.following[1].x) / 2;
-        const centerY = (this.camera.following[0].y + this.camera.following[1].y) / 2;
-        
-        // Calculate camera position
-        const cameraX = centerX - (this.canvas.width / 2);
-        const cameraY = centerY - (this.canvas.height / 2);
-        
-        // Keep camera within bounds
-        this.camera.x = Utils.clamp(
-            cameraX,
-            0,
-            Math.max(0, CONFIG.CANVAS.WIDTH - this.canvas.width)
-        );
-        
-        this.camera.y = Utils.clamp(
-            cameraY,
-            0,
-            Math.max(0, CONFIG.CANVAS.HEIGHT - this.canvas.height)
-        );
-    }
     
     /**
      * Main game loop
@@ -232,17 +116,11 @@ class Game {
         switch (this.currentState) {
             case CONFIG.STATES.PLAYING:
                 this.updateGame(deltaTime);
-                this.updateCamera();
                 this.drawGame(); // Draw everything with proper camera transformation
                 break;
                 
             case CONFIG.STATES.PAUSED:
                 this.drawGame(); // Draw current state without updating
-                break;
-                
-            case CONFIG.STATES.MAIN_MENU:
-            case CONFIG.STATES.CHARACTER_SELECT:
-                // These screens are handled by HTML/CSS
                 break;
         }
         
