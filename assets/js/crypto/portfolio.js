@@ -1,3 +1,4 @@
+import { javaURI, fetchOptions } from '../api/config.js';
 // Function to open the cryptocurrency details modal
 
 console.log("portfolio.js is loaded.");
@@ -20,7 +21,7 @@ window.closeCryptoDetailsModal = function() {
 
 // Function to load cryptocurrency balances
 function loadCryptoBalances() {
-    console.log('Fetching crypto balances from: http://localhost:8085/api/mining/balances');
+    console.log('Fetching crypto balances from: /api/mining/balances backend endpoint.');
     // Get currently selected cryptocurrency from localStorage or default to BTC
     const currentMining = localStorage.getItem('currentMiningCrypto') || 'BTC';
     // Sample data to display when backend is unavailable
@@ -91,7 +92,9 @@ function loadCryptoBalances() {
         currentMining: currentMining // Use the saved cryptocurrency
     };
     // Try to fetch from the API first
-    fetch('http://localhost:8085/api/mining/balances')
+    const balanceUrl = `${javaURI}/api/mining/balances`;
+    console.log("Fetching balance from:", balanceUrl);
+    fetch(balanceUrl, fetchOptions)
         .then(response => {
             console.log('Response status:', response.status);
             if (!response.ok) {
@@ -216,7 +219,9 @@ function loadAvailableCryptocurrencies() {
         }
     ];
     // Try to fetch from the API first
-    fetch('http://localhost:8085/api/mining/cryptocurrencies')
+    const currencyUrl = `${javaURI}/api/mining/cryptocurrencies`;
+    console.log("Fetching currencies from:", currencyUrl);
+    fetch(currencyUrl, fetchOptions)
         .then(response => {
             console.log('Response status:', response.status);
             if (!response.ok) {
@@ -283,7 +288,9 @@ function selectCryptocurrency(symbol) {
     // Save the selected cryptocurrency to localStorage
     localStorage.setItem('currentMiningCrypto', symbol);
     // Try to call the API first
-    fetch(`http://localhost:8085/api/mining/crypto/select/${symbol}`, {
+    const selectionUrl = `${javaURI}/api/mining/cryptocurrencies`;
+    console.log("Sending to endpoint:", selectionUrl);
+    fetch(selectionUrl, {
         method: 'POST'
     })
     .then(response => {

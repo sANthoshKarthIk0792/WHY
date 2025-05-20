@@ -1,5 +1,5 @@
 ---
-layout: finance
+layout: fortunefinders
 title: Media Bias Game
 permalink: /media
 ---

@@ -9,7 +9,6 @@ permalink: /crypto/miningbackup
 <!-- Any CSS or styling adjustments should be done @ {base}/assets/css/crypto.css  -->
 
 <html lang="en">
-<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -18,8 +17,6 @@ permalink: /crypto/miningbackup
     <link href="https://unpkg.com/intro.js/minified/introjs.min.css" rel="stylesheet">
     <script src="https://unpkg.com/intro.js/minified/intro.min.js"></script>
     <link rel="stylesheet" href="{{site.baseurl}}/assets/css/crypto.css"/>
-</head>
-<body>
     <div id="notification" class="notification"></div>
     <div class="main-content">
         <!-- Tutorial Help Button -->
@@ -42,6 +39,7 @@ permalink: /crypto/miningbackup
                         <div>
                             <div class="stat-label">Pending Crypto Balance</div>
                             <div class="stat-value text-yellow-400" id="pending-balance">0.00000000</div>
+                            <script type="module" src="{{site.baseurl}}/assets/js/crypto/portfolio.js"></script>
                             <span class="text-sm text-blue-400 cursor-pointer hover:underline mt-1 inline-block" onclick="openCryptoDetailsModal()">View all crypto balances &rarr;</span>
                         </div>
                         <div>
@@ -49,8 +47,8 @@ permalink: /crypto/miningbackup
                             <div class="stat-value text-green-400" id="usd-value">$0.00</div>
                         </div>
                         <div>
-                            <div class="stat-label" id="pool-info">Min. Payout</div>
-                            <div class="stat-value text-yellow-400" id="pool-info">0.001 BTC</div>
+                            <div class="stat-label" id="pool-info"></div>
+                            <div class="stat-value text-yellow-400" id="pool-info"></div>
                         </div>
                     </div>
                 </div>
@@ -246,6 +244,4 @@ permalink: /crypto/miningbackup
                 </div>
             </div>
         </div>
-        <script src="{{site.baseurl}}/assets/js/crypto/portfolio.js"></script>
     </div>
-</body>
