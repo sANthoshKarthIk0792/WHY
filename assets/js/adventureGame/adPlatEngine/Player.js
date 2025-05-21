@@ -1,5 +1,5 @@
 /**
- * Platformer - Character Classes
+ * End Ship Platformer - Character Classes
  * Contains base Character class and Player class
  */
 
@@ -249,8 +249,15 @@ class Character {
             this.y = CONFIG.PLAYER.START_Y;
             this.velocityX = 0;
             this.velocityY = 0;
-            // Reset health to allow die state to be meaningful
-            this.health = this.maxHealth;
+            this.health -= 10; // Lose health when falling out of bounds
+            
+            // Check if player is now dead
+            if (this.health <= 0) {
+                // Handle game over
+                if (window.game) {
+                    window.game.setGameState(CONFIG.STATES.GAME_OVER);
+                }
+            }
         }
     }
 
@@ -365,8 +372,8 @@ class Player extends Character {
         );
         
         // Basic player properties
-        this.color = "rgba(0, 128, 255, 1.0)"; // Default blue color
-        this.name = "Player";
+        this.color = CONFIG.PLAYER.COLOR || "#9b30ff"; // Purple for End theme
+        this.name = "Player 1";
     }
     
     /**
@@ -374,16 +381,16 @@ class Player extends Character {
      * @param {CanvasRenderingContext2D} ctx - Canvas context
      */
     draw(ctx) {
-        // Draw player with character color
+        // Draw player body with End theme colors
         ctx.fillStyle = this.color;
         ctx.fillRect(this.x, this.y, this.width, this.height);
         
         // Draw head
-        ctx.fillStyle = 'rgba(255, 204, 153, 1.0)';
+        ctx.fillStyle = '#d8a8ff'; // Light purple for head
         ctx.fillRect(this.x + 10, this.y, this.width - 20, 20);
         
-        // Draw direction indicator
-        ctx.fillStyle = 'rgba(255, 255, 255, 1.0)';
+        // Draw direction indicator (eye)
+        ctx.fillStyle = '#00ffea'; // Cyan for eye (End portal particle color)
         ctx.fillRect(
             this.direction > 0 ? this.x + this.width - 15 : this.x + 5,
             this.y + 5,
@@ -393,7 +400,7 @@ class Player extends Character {
         
         // Draw debug info if enabled
         if (CONFIG.GAME.DEBUG_MODE) {
-            ctx.fillStyle = 'rgba(255, 255, 255, 1.0)';
+            ctx.fillStyle = '#d8a8ff'; // Light purple
             ctx.font = '10px Arial';
             ctx.fillText(`HP: ${Math.floor(this.health)}/${this.maxHealth}`, this.x, this.y - 5);
         }

@@ -1,12 +1,11 @@
 /**
- * CS Fighters - Input Handler
+ * End Ship Platformer - Input Handler
  * Manages keyboard input and UI interactions
  */
 
 const InputHandler = {
-    // State of keys for both players
+    // State of keys
     keys: {
-        // Player 1 (WASD)
         up: false,
         down: false,
         left: false,
@@ -23,7 +22,7 @@ const InputHandler = {
         // Key down event
         window.addEventListener('keydown', (e) => {
             // Prevent default behavior for game keys
-            if (['w', 'a', 's', 'd', ' ', 'q', 'e', 'r', 'p', 'Escape'].includes(e.key)) {
+            if (['w', 'a', 's', 'd', ' ', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'p', 'Escape'].includes(e.key)) {
                 e.preventDefault();
             }
             
@@ -55,9 +54,13 @@ const InputHandler = {
             this.game.resumeGame();
         });
         
-        document.getElementById('exit-to-menu-btn').addEventListener('click', () => {
-            this.game.exitToMenu();
-        });
+        // Game over screen buttons
+        const retryBtn = document.getElementById('retry-btn');
+        if (retryBtn) {
+            retryBtn.addEventListener('click', () => {
+                this.game.initGame();
+            });
+        }
     },
     
     /**
@@ -68,17 +71,22 @@ const InputHandler = {
         // Only process keys if game is in playing state
         if (this.game.currentState === CONFIG.STATES.PLAYING) {
             switch (key) {
-                // Player 1 controls (WASD)
+                // Player controls (WASD and Arrow keys)
                 case 'w':
+                case 'ArrowUp':
+                case ' ': // Space
                     this.keys.up = true;
                     break;
                 case 's':
+                case 'ArrowDown':
                     this.keys.down = true;
                     break;
                 case 'a':
+                case 'ArrowLeft':
                     this.keys.left = true;
                     break;
                 case 'd':
+                case 'ArrowRight':
                     this.keys.right = true;
                     break;
                 
@@ -93,6 +101,8 @@ const InputHandler = {
                     }
                     break;
             }
+        } else if (this.game.currentState === CONFIG.STATES.PAUSED && (key === 'p' || key === 'Escape')) {
+            this.game.resumeGame();
         }
     },
     
@@ -102,17 +112,21 @@ const InputHandler = {
      */
     handleKeyUp: function(key) {
         switch (key) {
-            // Player 1 controls (WASD)
             case 'w':
+            case 'ArrowUp':
+            case ' ': // Space
                 this.keys.up = false;
                 break;
             case 's':
+            case 'ArrowDown':
                 this.keys.down = false;
                 break;
             case 'a':
+            case 'ArrowLeft':
                 this.keys.left = false;
                 break;
             case 'd':
+            case 'ArrowRight':
                 this.keys.right = false;
                 break;
         }

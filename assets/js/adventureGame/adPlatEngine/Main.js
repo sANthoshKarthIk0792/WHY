@@ -1,16 +1,16 @@
 /**
- * CS Fighters - Main Entry Point
+ * End Ship Platformer - Main Entry Point
  * Initializes the game and handles overall game state
  */
 
 // Wait for DOM to be fully loaded
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('CS Fighters - Game Initializing');
+    console.log('End Ship Platformer - Game Initializing');
     
     // Initialize UI
     UI.init();
     
-    // Create game instance
+    // Create game instance - will auto-start the level
     const game = new Game();
     
     // Handle window resizing
@@ -56,5 +56,5 @@ document.addEventListener('DOMContentLoaded', function() {
         canvas.style.height = `${Math.min(800, newHeight - 150)}px`; // Subtract header/footer height
     }
     
-    console.log('CS Fighters - Game Initialized');
+    console.log('End Ship Platformer - Game Initialized');
 });

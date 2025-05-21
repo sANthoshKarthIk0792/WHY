@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>End Ship</title>
+    <title>End Ship Platformer</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
     <div class="game-container">
         <!-- Game Screen -->
-        <div id="game-screen" class="screen hidden">
+        <div id="game-screen" class="screen">
             <div class="game-header">
                 <div class="player-info player1-info">
                     <h3 id="player1-name">Player 1</h3>
@@ -27,7 +27,7 @@
             <div class="game-footer">
                 <div id="status-message">Ready!</div>
                 <div class="controls-hint">
-                    <p>Player 1: Move: WASD (W to jump)</p>
+                    <p>Move: WASD (W to jump)</p>
                 </div>
             </div>
         </div>
@@ -36,7 +36,12 @@
         <div id="pause-screen" class="screen hidden">
             <h2>Game Paused</h2>
             <button id="resume-btn" class="menu-btn">Resume</button>
-            <button id="exit-to-menu-btn" class="menu-btn">Exit to Menu</button>
+        </div>
+
+        <!-- Game Over Screen -->
+        <div id="game-over-screen" class="screen hidden">
+            <h2>Game Over</h2>
+            <button id="retry-btn" class="menu-btn">Try Again</button>
         </div>
     </div>
 
