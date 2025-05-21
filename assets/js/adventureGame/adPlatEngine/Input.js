@@ -23,7 +23,7 @@ const InputHandler = {
         // Key down event
         window.addEventListener('keydown', (e) => {
             // Prevent default behavior for game keys
-            if (['w', 'a', 's', 'd', ' ', 'q', 'e', 'r', 'p', 'Escape', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ',', '.', '/'].includes(e.key)) {
+            if (['w', 'a', 's', 'd', ' ', 'q', 'e', 'r', 'p', 'Escape'].includes(e.key)) {
                 e.preventDefault();
             }
             
@@ -82,52 +82,6 @@ const InputHandler = {
                     this.keys.right = true;
                     break;
                 
-                // Player 2 controls (Arrow keys)
-                case 'ArrowUp':
-                    this.keys.up2 = true;
-                    break;
-                case 'ArrowDown':
-                    this.keys.down2 = true;
-                    break;
-                case 'ArrowLeft':
-                    this.keys.left2 = true;
-                    break;
-                case 'ArrowRight':
-                    this.keys.right2 = true;
-                    break;
-                
-                // Shared controls (Space for attack)
-                case 't':
-                    this.keys.attack = true;
-                    break;
-                case 'm':
-                    this.keys.attack2 = true;
-                    break;
-                
-                // Player 1 skill keys (Q/E/R)
-                case 'q':
-                    this.keys.basicSkill = true;
-                    break;
-                case 'e':
-                    this.keys.specialSkill = true;
-                    break;
-                case 'r':
-                    this.keys.ultimateSkill = true;
-                    break;
-                
-                // Player 2 skill keys (, . /)
-                case ',':
-                    this.keys.basicSkill2 = true;
-                    this.keys.basicSkillKey2 = true;
-                    break;
-                case '.':
-                    this.keys.specialSkill2 = true;
-                    this.keys.specialSkillKey2 = true;
-                    break;
-                case '/':
-                    this.keys.ultimateSkill2 = true;
-                    this.keys.ultimateSkillKey2 = true;
-                    break;
                 case 'p':
                     if (this.game.currentState === CONFIG.STATES.PLAYING) {
                         this.game.pauseGame();
@@ -161,53 +115,6 @@ const InputHandler = {
             case 'd':
                 this.keys.right = false;
                 break;
-            
-            // Player 2 controls (Arrow keys)
-            case 'ArrowUp':
-                this.keys.up2 = false;
-                break;
-            case 'ArrowDown':
-                this.keys.down2 = false;
-                break;
-            case 'ArrowLeft':
-                this.keys.left2 = false;
-                break;
-            case 'ArrowRight':
-                this.keys.right2 = false;
-                break;
-            
-            // Shared controls (Space for attack)
-            case 't':
-                this.keys.attack = false;
-                break;
-            case 'm':
-                this.keys.attack2 = false;
-                break;
-            
-            // Player 1 skill keys (Q/E/R)
-            case 'q':
-                this.keys.basicSkill = false;
-                break;
-            case 'e':
-                this.keys.specialSkill = false;
-                break;
-            case 'r':
-                this.keys.ultimateSkill = false;
-                break;
-            
-            // Player 2 skill keys (, . /)
-            case ',':
-                this.keys.basicSkill2 = false;
-                this.keys.basicSkillKey2 = false;
-                break;
-            case '.':
-                this.keys.specialSkill2 = false;
-                this.keys.specialSkillKey2 = false;
-                break;
-            case '/':
-                this.keys.ultimateSkill2 = false;
-                this.keys.ultimateSkillKey2 = false;
-                break;
         }
     },
     
@@ -219,9 +126,5 @@ const InputHandler = {
         this.keys.down = false;
         this.keys.left = false;
         this.keys.right = false;
-        this.keys.attack = false;
-        this.keys.basicSkill = false;
-        this.keys.specialSkill = false;
-        this.keys.ultimateSkill = false;
     }
 };

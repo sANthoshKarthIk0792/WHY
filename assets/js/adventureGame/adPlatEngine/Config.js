@@ -42,7 +42,7 @@ const CONFIG = {
     // Environment settings
     ENVIRONMENT: {
         FLOOR_Y: 980,
-        PLATFORMS: END, // Randomly selected platforms
+        PLATFORMS: END, 
         FLOOR_ACTIVE: true,
         PITS: [], // Can add pit locations here
         WALLS: [], // Can add wall locations here
