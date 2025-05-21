@@ -1,5 +1,5 @@
 /**
- * CS Fighters - Game Configuration
+ * End Ship Platformer Game Configuration
  * Contains all game constants and settings
  */
 
@@ -13,6 +13,8 @@ const PLATFORM_CONFIGS = {
         { x: 860, y: 500, width: 200, height: 20 },
     ]
 };
+
+let currentPlatformConfig = 'END';
 
 const CONFIG = {
     // Canvas settings
@@ -42,7 +44,7 @@ const CONFIG = {
     // Environment settings
     ENVIRONMENT: {
         FLOOR_Y: 980,
-        PLATFORMS: END, 
+        PLATFORMS: PLATFORM_CONFIGS.END, 
         FLOOR_ACTIVE: true,
         PITS: [], // Can add pit locations here
         WALLS: [], // Can add wall locations here
@@ -63,5 +65,5 @@ const CONFIG = {
 
 // Export for use in other files
 window.PLATFORM_CONFIGS = PLATFORM_CONFIGS;
-window.setPlatformConfig = setPlatformConfig;
-window.getCurrentPlatformConfig = getCurrentPlatformConfig;
+// window.setPlatformConfig = setPlatformConfig;
+// window.getCurrentPlatformConfig = getCurrentPlatformConfig;

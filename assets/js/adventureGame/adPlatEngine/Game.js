@@ -151,9 +151,6 @@ class Game {
         // Save the canvas state
         this.ctx.save();
         
-        // Apply camera transform
-        this.ctx.translate(-this.camera.x, -this.camera.y);
-        
         // Draw floor
         this.ctx.fillStyle = 'rgba(85, 85, 85, 1.0)';
         this.ctx.fillRect(0, CONFIG.ENVIRONMENT.FLOOR_Y, CONFIG.CANVAS.WIDTH, CONFIG.CANVAS.HEIGHT - CONFIG.ENVIRONMENT.FLOOR_Y);
