@@ -67,6 +67,105 @@ class Player extends Character {
     }
 
     /**
+     * Fires a homing projectile at the nearest enemy when 'V' is pressed
+     */
+    /**
+ * Fires a homing projectile at the nearest enemy when 'V' is pressed
+ */
+handleShootKeyDown(event) {
+    if (event.key === 'v' || event.key === 'V') {
+        console.log('V key pressed - attempting to fire projectile');
+        
+        // Debug: Check if gameEnv and gameObjects exist
+        if (!this.gameEnv) {
+            console.error('gameEnv is not defined');
+            return;
+        }
+        
+        if (!this.gameEnv.gameObjects) {
+            console.error('gameObjects is not defined');
+            return;
+        }
+        
+        console.log('Total game objects:', this.gameEnv.gameObjects.length);
+        
+        // Find enemies in the game environment with better filtering
+        const enemies = this.gameEnv.gameObjects.filter(obj => {
+            // Skip if this is the current player
+            if (obj === this) {
+                return false;
+            }
+            
+            // Check if object has enemy properties
+            const isEnemy = obj?.spriteData?.isEnemy || obj?.isEnemy;
+            
+            // Debug log each object
+            if (obj?.spriteData?.id) {
+                console.log(`Checking ${obj.spriteData.id}: isEnemy=${isEnemy}`);
+            }
+            
+            return isEnemy;
+        });
+        
+        console.log('Found enemies:', enemies.length);
+        
+        if (enemies.length === 0) {
+            console.log('No enemies found to target');
+            console.log('Available game objects:');
+            this.gameEnv.gameObjects.forEach(obj => {
+                console.log(`- ${obj?.spriteData?.id || 'Unknown'}: isEnemy=${obj?.spriteData?.isEnemy || obj?.isEnemy}`);
+            });
+            return;
+        }
+
+        // Find the closest enemy with better error handling
+        let closestEnemy = null;
+        let closestDistance = Infinity;
+        
+        for (const enemy of enemies) {
+            if (!enemy.position) {
+                console.warn('Enemy has no position:', enemy);
+                continue;
+            }
+            
+            const dx = enemy.position.x - this.position.x;
+            const dy = enemy.position.y - this.position.y;
+            const distance = dx * dx + dy * dy;
+            
+            if (distance < closestDistance) {
+                closestDistance = distance;
+                closestEnemy = enemy;
+            }
+        }
+        
+        if (!closestEnemy) {
+            console.log('No valid enemy with position found');
+            return;
+        }
+
+        console.log('Targeting closest enemy:', closestEnemy.spriteData?.id || 'Unknown');
+
+        // Create a homing projectile with error handling
+        try {
+            const projectile = new HomingProjectile(
+                this.position.x + (this.size?.width || 0) / 2, // Center of player
+                this.position.y + (this.size?.height || 0) / 2, // Center of player
+                closestEnemy,
+                this.gameEnv // Pass gameEnv as the 4th parameter
+            );
+            
+            // Add to both local projectiles array and game objects
+            this.projectiles.push(projectile);
+            this.gameEnv.gameObjects.push(projectile);
+            
+            console.log('Projectile created and added to game');
+        } catch (error) {
+            console.error('Error creating projectile:', error);
+        }
+    }
+}
+
+    /**
      * Update the player's velocity and direction based on the pressed keys.
      */
     updateVelocityAndDirection() {
@@ -113,13 +212,48 @@ class Player extends Character {
     }
     update() {
         super.update();
-        if(!this.moved){
-            if (this.gravity) {
-                    this.time += 1;
-                    this.velocity.y += 0.5 + this.acceleration * this.time;
+        
+        // Update projectiles more efficiently
+        for (let i = this.projectiles.length - 1; i >= 0; i--) {
+            const projectile = this.projectiles[i];
+            
+            if (!projectile.active) {
+                // Remove inactive projectiles
+                this.projectiles.splice(i, 1);
+                
+                // Also remove from game objects if it's still there
+                const gameIndex = this.gameEnv.gameObjects.indexOf(projectile);
+                if (gameIndex > -1) {
+                    this.gameEnv.gameObjects.splice(gameIndex, 1);
+                }
+                continue;
+            }
+            
+            // Update the projectile
+            projectile.update();
+            
+            // Check if projectile went out of bounds
+            if (projectile.position.x < -50 || projectile.position.x > this.gameEnv.innerWidth + 50 ||
+                projectile.position.y < -50 || projectile.position.y > this.gameEnv.innerHeight + 50) {
+                
+                projectile.active = false;
+                this.projectiles.splice(i, 1);
+                
+                // Remove from game objects array
+                const gameIndex = this.gameEnv.gameObjects.indexOf(projectile);
+                if (gameIndex > -1) {
+                    this.gameEnv.gameObjects.splice(gameIndex, 1);
                 }
             }
-        else{
+        }
+        
+        // Gravity logic
+        if (!this.moved) {
+            if (this.gravity) {
+                this.time += 1;
+                this.velocity.y += 0.5 + this.acceleration * this.time;
+            }
+        } else {
             this.time = 0;
         }
         }
