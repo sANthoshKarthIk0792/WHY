@@ -49,7 +49,7 @@ class GameLevelDesert {
         upLeft: {row: 2, start: 0, columns: 3, rotate: Math.PI/16 },
         upRight: {row: 1, start: 0, columns: 3, rotate: -Math.PI/16 },
         hitbox: { widthPercentage: 0.45, heightPercentage: 0.2 },
-        keypress: { up: 87, left: 65, down: 83, right: 68 } // W, A, S, D
+        keypress: { up: 87, left: 65, down: 83, right: 68 }, // W, A, S, D
     };
 
     
@@ -64,6 +64,7 @@ class GameLevelDesert {
         src: sprite_src_tux,
         SCALE_FACTOR: 8,
         ANIMATION_RATE: 50,
+        isEnemy: true,
         pixels: {height: 256, width: 352},
         INIT_POSITION: { x: (width / 2), y: (height / 2)},
         orientation: {rows: 8, columns: 11 },
@@ -522,6 +523,7 @@ class GameLevelDesert {
         id: 'Robot',
         greeting: sprite_greet_robot,
         src: sprite_src_robot,
+        isEnemy: true,
         SCALE_FACTOR: 10,
         ANIMATION_RATE: 100,
         pixels: {height: 316, width: 627},

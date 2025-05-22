@@ -1,4 +1,5 @@
 import Character from './Character.js';
+import HomingProjectile from './HomingProjectile.js'; // Import the HomingProjectile class
 
 // Define non-mutable constants as defaults
 const SCALE_FACTOR = 25; // 1/nth of the height of the canvas
@@ -26,10 +27,12 @@ class Player extends Character {
         this.keypress = data?.keypress || {up: 87, left: 65, down: 83, right: 68};
         this.pressedKeys = {}; // active keys array
         this.bindMovementKeyListners();
+        this.bindShootKeyListener(); // Add shoot key listener
         this.gravity = data.GRAVITY || false;
         this.acceleration = 0.001;
         this.time = 0;
         this.moved = false;
+        this.projectiles = []; // Array to store active projectiles
     }
 
     /**
@@ -41,6 +44,13 @@ class Player extends Character {
     bindMovementKeyListners() {
         addEventListener('keydown', this.handleKeyDown.bind(this));
         addEventListener('keyup', this.handleKeyUp.bind(this));
+    }
+
+    /**
+     * Binds the shoot key listener
+     */
+    bindShootKeyListener() {
+        addEventListener('keydown', this.handleShootKeyDown.bind(this));
     }
 
     handleKeyDown({ keyCode }) {
@@ -210,6 +220,7 @@ handleShootKeyDown(event) {
             this.moved = false;
         }
     }
+
     update() {
         super.update();
         
@@ -256,7 +267,7 @@ handleShootKeyDown(event) {
         } else {
             this.time = 0;
         }
-        }
+    }
         
     /**
      * Overrides the reaction to the collision to handle
@@ -270,8 +281,6 @@ handleShootKeyDown(event) {
         this.updateVelocityAndDirection();
         super.handleCollisionReaction(other);
     }
-
-
 }
 
 export default Player;
